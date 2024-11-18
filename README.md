@@ -10,4 +10,4 @@ Ovaj direktorij sadrži sve backend servise za aplikaciju **Eduformacije**. Svak
 
 ## Postavljanje
 
-Svaki servis ima svoj vlastiti `cmd/main.go` fajl za pokretanje. Konfiguracije su specifične po servisu.
+Svaki servis je Dokeriziran, konfiguracije su specifične po servisu.
