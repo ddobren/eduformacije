@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM golang:1.20 AS builder
+FROM ghcr.io/ddobren/golang:1.20 AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ RUN go mod tidy
 RUN go build -o main . && ls -l main
 
 # Stage 2: Runtime
-FROM debian:bookworm-slim
+FROM ghcr.io/ddobren/debian:bookworm-slim
 
 WORKDIR /root/
 
