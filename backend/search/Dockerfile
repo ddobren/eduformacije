@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 RUN chmod +x main
 
 # Expose the application port
-EXPOSE 8080
+EXPOSE 80
 
 # Set the default command to run the binary
 CMD ["./main"]
