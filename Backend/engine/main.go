@@ -66,6 +66,11 @@ func main() {
 	// Inicijalizacija Redis klijenta
 	database.InitRedis()
 
+	// Inicijalizacija
+	database.InitMongo()
+	services.UpdateSrednjeSkole()
+	services.UpdateOsnovneSkole()
+
 	// Postavljanje Gin mode iz environment varijable
 	ginMode := config.GetEnv("GIN_MODE", "debug") // Default na "debug" ako nije postavljeno
 	gin.SetMode(ginMode)                          // Postavljamo Gin mode za debug ili release
@@ -92,6 +97,9 @@ func main() {
 	r.GET("/api/v1/srednje-skole", handlers.GetSrednjeSkoleHandler)
 	r.GET("/api/v1/srednje-skole/zupanije", handlers.GetZupanijeHandler)
 	r.GET("/api/v1/srednje-skole/mjesta", handlers.GetMjestaHandler)
+
+	r.GET("/api/v1/skole/srednje", handlers.GetSrednjeSkoleeHandler)
+	r.GET("/api/v1/skole/osnovne", handlers.GetOsnovneSkoleHandler)
 
 	// Periodično ažuriranje podataka svakih 24 sata
 	go startPolling(24 * time.Hour)
