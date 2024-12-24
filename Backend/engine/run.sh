@@ -30,4 +30,6 @@ fi
 echo "Otvori MongoDB shell u novom terminalu..."
 gnome-terminal -- bash -c "docker exec -it eduformacije-mongo mongo -u root -p example --authenticationDatabase admin; exec bash" || { echo "Greška pri otvaranju MongoDB shella."; exit 1; }
 
-echo "GOTOVO!!!"
+echo "========================================"
+echo "Uspješno ste pokrenuli sve kontejnere."
+echo "========================================"
