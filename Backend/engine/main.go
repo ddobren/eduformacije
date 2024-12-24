@@ -66,7 +66,7 @@ func main() {
 	// Inicijalizacija Redis klijenta
 	database.InitRedis()
 
-	// Inicijalizacija
+	// Inicijalizacija MongoDB
 	database.InitMongo()
 	services.UpdateSrednjeSkole()
 	services.UpdateOsnovneSkole()
@@ -92,14 +92,17 @@ func main() {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery()) // Recovery middleware za panic handling
 
-	// Registrujemo rute
-	r.POST("/api/v1/srednje-skole/sugestije", handlers.PostSugestijeHandler)
-	r.GET("/api/v1/srednje-skole", handlers.GetSrednjeSkoleHandler)
-	r.GET("/api/v1/srednje-skole/zupanije", handlers.GetZupanijeHandler)
-	r.GET("/api/v1/srednje-skole/mjesta", handlers.GetMjestaHandler)
+	// JWT middleware za osiguranje API-ja
+	api := r.Group("/api/v1", handlers.JWTAuthMiddleware())
+	{
+		api.POST("/srednje-skole/sugestije", handlers.PostSugestijeHandler)
+		api.GET("/srednje-skole", handlers.GetSrednjeSkoleHandler)
+		api.GET("/srednje-skole/zupanije", handlers.GetZupanijeHandler)
+		api.GET("/srednje-skole/mjesta", handlers.GetMjestaHandler)
 
-	r.GET("/api/v1/skole/srednje", handlers.GetSrednjeSkoleeHandler)
-	r.GET("/api/v1/skole/osnovne", handlers.GetOsnovneSkoleHandler)
+		api.GET("/skole/srednje", handlers.GetSrednjeSkoleeHandler)
+		api.GET("/skole/osnovne", handlers.GetOsnovneSkoleHandler)
+	}
 
 	// Periodično ažuriranje podataka svakih 24 sata
 	go startPolling(24 * time.Hour)
