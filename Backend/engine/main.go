@@ -65,6 +65,7 @@ func main() {
 
 	// Inicijalizacija Redis klijenta
 	database.InitRedis()
+	rdb := database.GetRedisClient()
 
 	// Inicijalizacija MongoDB
 	database.InitMongo()
@@ -91,6 +92,9 @@ func main() {
 	// Omogućavanje CORS-a za sigurnost (samo ako aplikacija komunicira s frontendima ili aplikacijama)
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery()) // Recovery middleware za panic handling
+
+	// Primjena rate limiting middleware-a (10 zahtjeva u 1 sekundi)
+	r.Use(handlers.CustomRateLimiter(rdb, 10, time.Second))
 
 	// JWT middleware za osiguranje API-ja
 	api := r.Group("/api/v1", handlers.JWTAuthMiddleware())
