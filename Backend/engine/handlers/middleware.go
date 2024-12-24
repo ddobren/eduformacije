@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -15,6 +16,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+			log.Println("Authorization header missing or invalid")
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Nevažeći ili nedostajući token"})
 			return
 		}
@@ -31,10 +33,12 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
+			log.Printf("Invalid token: %v", err)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Nevažeći token"})
 			return
 		}
 
+		log.Printf("Token validated successfully for request: %s %s", c.Request.Method, c.Request.URL.Path)
 		c.Next()
 	}
 }
