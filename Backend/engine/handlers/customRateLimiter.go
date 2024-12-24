@@ -30,7 +30,7 @@ func CustomRateLimiter(rdb *redis.Client, limit int, window time.Duration) gin.H
 			return nil
 		})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Greška u rate limiteru"})
+			c.Status(http.StatusInternalServerError)
 			c.Abort()
 			return
 		}
@@ -39,7 +39,7 @@ func CustomRateLimiter(rdb *redis.Client, limit int, window time.Duration) gin.H
 		windowStart := float64(now - int64(window.Milliseconds()))
 		reqCount, err := rdb.ZCount(ctx, redisKey, fmt.Sprintf("%f", windowStart), fmt.Sprintf("%f", float64(now))).Result()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Greška u Redis rate limiteru"})
+			c.Status(http.StatusInternalServerError)
 			c.Abort()
 			return
 		}
@@ -49,7 +49,7 @@ func CustomRateLimiter(rdb *redis.Client, limit int, window time.Duration) gin.H
 			// Dohvaćanje najstarijeg zahtjeva iz trenutnog prozora
 			oldestReq, err := rdb.ZRange(ctx, redisKey, 0, 0).Result()
 			if err != nil || len(oldestReq) == 0 {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Greška u Redis rate limiteru"})
+				c.Status(http.StatusInternalServerError)
 				c.Abort()
 				return
 			}
@@ -59,12 +59,9 @@ func CustomRateLimiter(rdb *redis.Client, limit int, window time.Duration) gin.H
 			fmt.Sscanf(oldestReq[0], "%d", &oldestTimestamp)
 			retryAfter := time.Duration((int64(window.Milliseconds()) - (now - oldestTimestamp))) * time.Millisecond
 
-			// Postavljanje Retry-After zaglavlja i vraćanje odgovora
+			// Postavljanje Retry-After zaglavlja i vraćanje samo HTTP koda 429
 			c.Header("Retry-After", fmt.Sprintf("%.0f", retryAfter.Seconds()))
-			c.JSON(http.StatusTooManyRequests, gin.H{
-				"error":       "Previše zahtjeva. Pokušajte ponovo kasnije.",
-				"retry_after": retryAfter.Seconds(),
-			})
+			c.Status(http.StatusTooManyRequests)
 			c.Abort()
 			return
 		}
