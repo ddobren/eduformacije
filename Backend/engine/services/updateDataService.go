@@ -10,13 +10,16 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ddobren/eduformacije/config"
 	"github.com/ddobren/eduformacije/database"
 	"github.com/ddobren/eduformacije/models"
 )
 
 // UpdateSkoleData - dohvaća JSON podatke sa API-ja i sprema ih u Redis
 func UpdateSkoleData() error {
-	resp, err := http.Get("https://srednje.e-upisi.hr/api/USS/GetSkole")
+	srednjeUpisiEndpoint := config.GetEnv("SREDNJE_SKOLE_INFO_URL", "")
+
+	resp, err := http.Get(srednjeUpisiEndpoint)
 	if err != nil {
 		return fmt.Errorf("ne mogu dohvatiti podatke s API-ja: %w", err)
 	}

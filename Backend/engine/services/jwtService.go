@@ -9,7 +9,7 @@ import (
 
 // GenerateJWT - generira novi JWT token za autentifikaciju
 func GenerateJWT() (string, error) {
-	secretKey := config.GetEnv("API_SECRET", "my_super_secret_key")
+	secretKey := config.GetEnv("API_SECRET", "")
 
 	claims := jwt.MapClaims{
 		"authorized": true,

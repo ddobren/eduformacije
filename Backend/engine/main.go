@@ -1,8 +1,7 @@
 package main
 
 import (
-	"log"
-	"os"
+	"net/http"
 	"strings"
 	"time"
 
@@ -12,9 +11,23 @@ import (
 	"github.com/ddobren/eduformacije/services"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var logger = logrus.New()
+
+func init() {
+	// Konfiguracija loggera za upotrebu lumberjack
+	logger.SetOutput(&lumberjack.Logger{
+		Filename:   "./server.log", // putanja do log datoteke
+		MaxSize:    1024,           // maksimalna veličina u megabajtima (1GB)
+		MaxBackups: 3,              // maksimalan broj backup datoteka
+		MaxAge:     28,             // maksimalan broj dana za zadržavanje backup datoteka
+		Compress:   true,           // da li da komprimira backup datoteke
+	})
+	// Postavljanje formata logiranja na JSON
+	logger.SetFormatter(&logrus.JSONFormatter{})
+}
 
 // Logiranje vremena trajanja zahtjeva s detaljima
 func logRequestDetails(c *gin.Context) {
@@ -104,38 +117,21 @@ func main() {
 		api.GET("/srednje-skole/zupanije", handlers.GetZupanijeHandler)
 		api.GET("/srednje-skole/mjesta", handlers.GetMjestaHandler)
 
-		api.GET("/skole/srednje", handlers.GetSrednjeSkoleeHandler)
+		api.GET("/skole/srednje", handlers.GetSrednjeSkoleHandler)
 		api.GET("/skole/osnovne", handlers.GetOsnovneSkoleHandler)
 	}
+
+	// favicon.ico handler, ignore it
+	r.GET("/favicon.ico", func(c *gin.Context) {
+		c.AbortWithStatus(http.StatusNoContent)
+	})
 
 	// Periodično ažuriranje podataka svakih 24 sata
 	go startPolling(24 * time.Hour)
 
-	// Inicijalno ažuriranje podataka
-	if err := services.UpdateSkoleData(); err != nil {
-		logError(err)
-	}
-
 	// Dohvati port iz environment varijable, default je 8080
 	port := config.GetEnv("PORT", "8080")
 	logger.Printf("Pokrećem server na :%s", port)
-
-	// Logiranje u datoteku za produkciju (ako GIN_MODE je release)
-	if ginMode == "release" {
-		logFile, err := os.OpenFile("server.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-		if err != nil {
-			log.Fatalf("Greška pri otvaranju log datoteke: %v", err)
-		}
-		logger.SetOutput(logFile)
-
-		// Postavljanje formata logova na tekstualni bez boja (plain text)
-		logger.SetFormatter(&logrus.TextFormatter{
-			FullTimestamp:   true,
-			TimestampFormat: time.RFC3339,
-			DisableColors:   true, // Onemogućiti boje
-			DisableQuote:    true,
-		})
-	}
 
 	// Pokreni server
 	if err := r.Run(":" + port); err != nil {
