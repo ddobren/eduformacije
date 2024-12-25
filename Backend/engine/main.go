@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -119,6 +120,8 @@ func main() {
 
 		api.GET("/skole/srednje", handlers.GetSrednjeSkoleHandler)
 		api.GET("/skole/osnovne", handlers.GetOsnovneSkoleHandler)
+
+		api.GET("/status", handlers.GetStatusHandler)
 	}
 
 	// favicon.ico handler, ignore it
@@ -131,7 +134,7 @@ func main() {
 
 	// Dohvati port iz environment varijable, default je 8080
 	port := config.GetEnv("PORT", "8080")
-	logger.Printf("Pokrećem server na :%s", port)
+	fmt.Printf("Server se pokreće na: %s\n", port)
 
 	// Pokreni server
 	if err := r.Run(":" + port); err != nil {
