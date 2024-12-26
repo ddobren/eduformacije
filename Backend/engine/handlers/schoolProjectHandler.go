@@ -53,7 +53,6 @@ func PostSugestijeHandler(c *gin.Context) {
 	})
 }
 
-// GetSrednjeSkoleHandler - GET /v1/srednje-skole
 func GetSrednjeSkoleHandler(c *gin.Context) {
 	rdb := database.GetRedisClient()
 	data, err := rdb.Get(c.Request.Context(), "skole_json").Result()

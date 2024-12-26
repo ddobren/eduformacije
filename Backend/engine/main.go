@@ -80,6 +80,7 @@ func main() {
 	// Inicijalizacija Redis klijenta
 	database.InitRedis()
 	rdb := database.GetRedisClient()
+	services.UpdateSkoleData()
 
 	// Inicijalizacija MongoDB
 	database.InitMongo()
