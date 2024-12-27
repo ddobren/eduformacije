@@ -1,11 +1,35 @@
 version: '3.8'
+
 services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=false" # Omogućava API za testiranje (ukloni u produkciji)
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=dragojevicdobren@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certificates:/letsencrypt
+    networks:
+      - default
+
   engine:
     build: .
-    ports:
-      - "80:80" # Izloži port 80 na host mašini na port 80 u kontejneru
-      - "443:443" # Dodano za HTTPS, ali zahteva konfiguraciju SSL certifikata
-      # load env variables from .env file
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.engine.rule=Host(`engine.eduformacije.com`)"
+      - "traefik.http.routers.engine.entrypoints=websecure"
+      - "traefik.http.routers.engine.tls.certresolver=myresolver"
+    networks:
+      - default
     env_file:
       - .env
     depends_on:
@@ -32,3 +56,7 @@ services:
 volumes:
   mongo_data:
   redis_data:
+  traefik-certificates:
+
+networks:
+  default:
