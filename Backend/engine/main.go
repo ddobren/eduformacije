@@ -10,6 +10,7 @@ import (
 	"github.com/ddobren/eduformacije/database"
 	"github.com/ddobren/eduformacije/handlers"
 	"github.com/ddobren/eduformacije/services"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -100,16 +101,22 @@ func main() {
 	// Dohvati trusted proxy IP adrese iz environment varijable
 	trustedProxies := config.GetEnv("GIN_TRUSTED_PROXIES", "127.0.0.1")
 	proxies := strings.Split(trustedProxies, ",")
-
-	// Postavljanje trusted proxies
 	r.SetTrustedProxies(proxies)
 
-	// Omogućavanje CORS-a za sigurnost (samo ako aplikacija komunicira s frontendima ili aplikacijama)
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery()) // Recovery middleware za panic handling
+	// Dodaj CORS middleware
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"https://www.w3schools.com", "https://engine.eduformacije.com"}, // Dozvoljene domene
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},                      // Dozvoljene HTTP metode
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},                      // Dozvoljeni zaglavlja
+		ExposeHeaders:    []string{"Content-Length"},                                               // Zaglavlja koja se izlažu
+		AllowCredentials: true,                                                                     // Omogućavanje kolačića
+		MaxAge:           12 * time.Hour,                                                           // Cache za preflight zahtjeve
+	}))
 
 	// Primjena rate limiting middleware-a (10 zahtjeva u 1 sekundi)
 	r.Use(handlers.CustomRateLimiter(rdb, 10, time.Second))
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery()) // Recovery middleware za panic handling
 
 	// JWT middleware za osiguranje API-ja
 	api := r.Group("/api/v1", handlers.JWTAuthMiddleware())
