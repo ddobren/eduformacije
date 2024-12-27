@@ -1,30 +1,30 @@
-# Koristi official Golang base image
+# Koristi službeni Golang image za build fazu
 FROM golang:1.23 as builder
 
-# Postavi radni direktorij unutar containera
+# Postavi radni direktorij
 WORKDIR /app
 
-# Inicijalizuj Go modul
-RUN go mod init github.com/ddobren/eduformacije
+# Kopiraj i instaliraj zavisnosti
+COPY go.mod go.sum ./
+RUN go mod download
 
-# Kopiraj izvorni kod u radni direktorij
+# Kopiraj cijeli projekt
 COPY . .
 
-# Preuzmi zavisnosti. Koristi go mod cache da se izbjegnu ponovna preuzimanja.
-RUN go mod tidy
-
-# Prevedi Go aplikaciju
+# Buildaj aplikaciju
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
 
-# Druga faza za stvaranje tanke slike
+# Koristi minimalni Alpine image za produkciju
 FROM alpine:latest
+
+# Radni direktorij za aplikaciju
 WORKDIR /root/
 
-# Kopiraj prevedenu aplikaciju iz građene faze
+# Kopiraj prevedeni binarni fajl
 COPY --from=builder /app/main .
 
-# Izloži port aplikacije
-EXPOSE 80 
+# Izloži port 80
+EXPOSE 80
 
-# Postavi izvršni fajl kao ulaznu točku
+# Ulazna točka
 ENTRYPOINT ["./main"]
