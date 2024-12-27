@@ -4,7 +4,7 @@ services:
   traefik:
     image: traefik:v2.10
     command:
-      - "--api.insecure=false" # Omogućava API za testiranje (ukloni u produkciji)
+      - "--api.insecure=false" # Produkcija: API nije izložen
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
@@ -12,6 +12,8 @@ services:
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.email=dragojevicdobren@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.forwardedheaders.insecure=true"
+      - "--entrypoints.websecure.forwardedheaders.insecure=true"
     ports:
       - "80:80"
       - "443:443"
@@ -22,7 +24,9 @@ services:
       - default
 
   engine:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.engine.rule=Host(`engine.eduformacije.com`)"
@@ -35,9 +39,11 @@ services:
     depends_on:
       - mongo
       - redis
+    restart: unless-stopped # Restartuje se u slučaju greške
 
   mongo:
-    image: mongo
+    image: mongo:6.0
+    restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
@@ -45,13 +51,18 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=example
+    networks:
+      - default
 
   redis:
-    image: redis
+    image: redis:7.0
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - default
 
 volumes:
   mongo_data:
