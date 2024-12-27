@@ -57,10 +57,6 @@ volumes:
   mongo_data:
   redis_data:
   traefik-certificates:
-
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
+  
 networks:
   default:
