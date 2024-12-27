@@ -58,5 +58,9 @@ volumes:
   redis_data:
   traefik-certificates:
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
 networks:
   default:

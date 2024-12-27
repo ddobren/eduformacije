@@ -17,6 +17,7 @@ gnome-terminal -- bash -c "docker exec -it eduformacije-redis redis-cli; exec ba
 #========================================
 
 # Pokreni MongoDB
+# docker run -d --name eduformacije-mongo -p 27017:27017   -e MONGO_INITDB_ROOT_USERNAME=root   -e MONGO_INITDB_ROOT_PASSWORD=example   mongo:4.4
 echo "Provjera MongoDB kontejnera..."
 if [ "$(docker ps -q -f name=eduformacije-mongo)" ]; then
     echo "MongoDB kontejner je već pokrenut."
