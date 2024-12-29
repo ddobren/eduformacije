@@ -28,16 +28,21 @@ type Skola struct {
 	ImaDodatnuProvjeru *bool    `json:"ImaDodatnuProvjeru"`
 }
 
-type SugestijeRequest struct {
-	Interesi string   `json:"interesi"`
-	Programi []string `json:"programi"`
-}
-
-type SugestijeResponse struct {
-	Objasnjenje string   `json:"objasnjenje"`
-	Programi    []string `json:"programi"`
-}
-
-type Recommendation struct {
+// Struktura za (skolaID, program) - kako stiže iz frontenda i vraća se natrag
+// ProgramWithID - jedan program s pridruženim ID-om škole
+type ProgramWithID struct {
+	SkolaID string `json:"skolaID"`
 	Program string `json:"program"`
+}
+
+// SugestijeRequest - JSON koji stiže od frontenda
+type SugestijeRequest struct {
+	Interesi string          `json:"interesi"`
+	Programi []ProgramWithID `json:"programi"`
+}
+
+// SugestijeResponse - JSON koji vraćamo frontendu
+type SugestijeResponse struct {
+	Objasnjenje string          `json:"objasnjenje"`
+	Programi    []ProgramWithID `json:"programi"`
 }

@@ -1,5 +1,3 @@
-// handlers/schoolProjectHandler.go
-
 package handlers
 
 import (
@@ -16,24 +14,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SugestijeRequest - prima polja: interesi, programi
-type SugestijeRequest struct {
-	Interesi string   `json:"interesi"`
-	Programi []string `json:"programi"`
-}
-
-// PostSugestijeHandler - POST /v1/srednje-skole/sugestije
+// PostSugestijeHandler - POST /api/v1/srednje-skole/sugestije
 func PostSugestijeHandler(c *gin.Context) {
-	var reqBody SugestijeRequest
+	var reqBody models.SugestijeRequest
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		log.Printf("Nevažeći JSON body: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "nevažeći JSON body: " + err.Error(),
+			"error": "Nevažeći JSON body: " + err.Error(),
 		})
 		return
 	}
 
-	explanation, recommended, err := services.GetRecommendations(reqBody.Interesi, reqBody.Programi)
+	explanation, recommendedPrograms, err := services.GetRecommendations(
+		reqBody.Interesi,
+		reqBody.Programi,
+	)
 	if err != nil {
 		log.Printf("Greška pri pozivu Gemini API: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -42,17 +37,16 @@ func PostSugestijeHandler(c *gin.Context) {
 		return
 	}
 
-	var recommendedProgramNames []string
-	for _, rec := range recommended {
-		recommendedProgramNames = append(recommendedProgramNames, rec.Program)
+	// Sastavimo odgovor
+	resp := models.SugestijeResponse{
+		Objasnjenje: explanation,
+		Programi:    recommendedPrograms,
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"objasnjenje": explanation,
-		"programi":    recommendedProgramNames,
-	})
+	c.JSON(http.StatusOK, resp)
 }
 
+// ------------------------------------------------------------
 func GetSrednjeSkoleHandler(c *gin.Context) {
 	rdb := database.GetRedisClient()
 	data, err := rdb.Get(c.Request.Context(), "skole_json").Result()
