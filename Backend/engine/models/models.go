@@ -1,3 +1,5 @@
+// models/models.go
+
 package models
 
 type Skola struct {
@@ -26,11 +28,11 @@ type Skola struct {
 	ImaDodatnuProvjeru *bool    `json:"ImaDodatnuProvjeru"`
 }
 
-// Struktura za (skolaID, program) - kako stiže iz frontenda i vraća se natrag
+// Struktura za (skolaProgramRokId, program) - kako stiže iz frontenda i vraća se natrag
 // ProgramWithID - jedan program s pridruženim ID-om škole
 type ProgramWithID struct {
-	SkolaID string `json:"skolaID"`
-	Program string `json:"program"`
+	SkolaProgramRokId string `json:"skolaProgramRokId"`
+	Program           string `json:"program"`
 }
 
 // SugestijeRequest - JSON koji stiže od frontenda
