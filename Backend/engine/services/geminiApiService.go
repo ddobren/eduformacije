@@ -129,7 +129,7 @@ func parseOrFallback(cleanJSON string, fullText string, aiResp interface{}) erro
 	return json.Unmarshal([]byte(fullText), aiResp)
 }
 
-// GetRecommendations - glavni ulaz: prima interese, listu (skolaID, program)
+// GetRecommendations - glavni ulaz: prima interese, listu (SkolaProgramRokId, program)
 func GetRecommendations(interesi string, inputPrograms []models.ProgramWithID) (string, []models.ProgramWithID, error) {
 	// 1) JSON ulaznih programa
 	programsJSON, err := json.Marshal(inputPrograms)
@@ -139,7 +139,7 @@ func GetRecommendations(interesi string, inputPrograms []models.ProgramWithID) (
 
 	// 2) Sastavimo prompt
 	prompt := fmt.Sprintf(`
-	Ovo je popis školskih programa (s pripadajućim skolaID) u JSON formatu:
+	Ovo je popis školskih programa (s pripadajućim SkolaProgramRokId) u JSON formatu:
 	%s
 	
 	Interesi korisnika su: "%s".
@@ -149,16 +149,16 @@ func GetRecommendations(interesi string, inputPrograms []models.ProgramWithID) (
 	{
 	  "objasnjenje": "...",
 	  "programi": [
-		{ "skolaID":"...", "program":"..." },
+		{ "SkolaProgramRokId":"...", "program":"..." },
 		...
 	  ]
 	}
 	2. "objasnjenje" uvijek treba sadržavati kratki, prijateljski tekst na hrvatskom (obraćaš se korisniku sa 'ti', možeš dodati emoji). 
 	   Nikad ne smije biti prazan ni null.
-	3. "programi" treba sadržavati barem jedan (1–3) programa iz popisa koji su imalo povezani s interesima, a ako se ništa ne podudara, vrati programe koje ti predlažeš. 
+	3. "programi" treba sadržavati barem jedan programa iz popisa koji su imalo povezani s interesima, a ako se ništa ne podudara, vrati programe koje ti predlažeš. 
 	   Ako korisnikovi interesi izgledaju potpuno nasumično i nemaju nikakve veze s obrazovanjem, vrati "programi": [] (prazno). 
 	   Ali i tada napiši nešto kratko i pozitivno u "objasnjenje" (npr. "Veselimo se čuti više o tvojim obrazovnim interesima!").
-	4. Ne spominji ograničenja popisa programa - ovo je kompletan popis dostupnih programa.
+	4. Ne spominji ograničenja popisa programa i bilo što u tom kontekstu. - ovo je kompletan popis dostupnih programa.
 	   Radije izaberi one koji su barem malo približni korisničkim interesima ili, ako ništa ne vrijedi, stavi prazan niz.
 	5. Ne dodaji nikakve dodatne ključeve ni tekst izvan zadanog JSON-a.
 	
