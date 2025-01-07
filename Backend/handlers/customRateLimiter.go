@@ -44,7 +44,7 @@ func CustomRateLimiter(rdb *redis.Client, limit int, window time.Duration) gin.H
 			return
 		}
 
-		// Provjera da li je broj zahtjeva premašio limit
+		// Provjera jeli broj zahtjeva premašio limit
 		if int(reqCount) > limit {
 			// Dohvaćanje najstarijeg zahtjeva iz trenutnog prozora
 			oldestReq, err := rdb.ZRange(ctx, redisKey, 0, 0).Result()

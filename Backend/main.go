@@ -105,12 +105,12 @@ func main() {
 
 	// Dodaj CORS middleware
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://www.w3schools.com", "https://engine.eduformacije.com"}, // Dozvoljene domene
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},                      // Dozvoljene HTTP metode
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},                      // Dozvoljeni zaglavlja
-		ExposeHeaders:    []string{"Content-Length"},                                               // Zaglavlja koja se izlažu
-		AllowCredentials: true,                                                                     // Omogućavanje kolačića
-		MaxAge:           12 * time.Hour,                                                           // Cache za preflight zahtjeve
+		AllowOrigins:     []string{"*"},                                       // Dozvoljene domene
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Dozvoljene HTTP metode
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // Dozvoljeni zaglavlja
+		ExposeHeaders:    []string{"Content-Length"},                          // Zaglavlja koja se izlažu
+		AllowCredentials: true,                                                // Omogućavanje kolačića
+		MaxAge:           12 * time.Hour,                                      // Cache za preflight zahtjeve
 	}))
 
 	// Primjena rate limiting middleware-a (10 zahtjeva u 1 sekundi)
@@ -132,7 +132,7 @@ func main() {
 		api.GET("/status", handlers.GetStatusHandler)
 	}
 
-	// favicon.ico handler, ignore it
+	// favicon.ico handler, ignoriranje
 	r.GET("/favicon.ico", func(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNoContent)
 	})

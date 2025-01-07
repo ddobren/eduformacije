@@ -12,34 +12,34 @@ import (
 
 var MongoClient *mongo.Client
 
-// InitMongo initializes the MongoDB client
+// InitMongo inicijalizira MongoDB klijent
 func InitMongo() {
-	// Load MONGO_URI from the .env file
+	// Učitaj MONGO_URI iz .env datoteke
 	mongoURI := config.GetEnv("MONGO_URI", "mongodb://localhost:27017")
-	log.Printf("Connecting to MongoDB with URI: %s", mongoURI)
+	log.Printf("Povezivanje na MongoDB s URI: %s", mongoURI)
 
 	clientOptions := options.Client().ApplyURI(mongoURI)
 
-	// Create a context with a timeout for the connection
+	// Kreiraj kontekst s timeoutom za povezivanje
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Use mongo.Connect instead of mongo.NewClient and client.Connect
+	// Koristi mongo.Connect umjesto mongo.NewClient i client.Connect
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		log.Fatalf("Error connecting to MongoDB: %v", err)
+		log.Fatalf("Greška pri povezivanju na MongoDB: %v", err)
 	}
 
-	// Optionally, verify the connection with Ping
+	// Opcionalno, provjeri vezu s Ping
 	if err := client.Ping(ctx, nil); err != nil {
-		log.Fatalf("Could not ping MongoDB: %v", err)
+		log.Fatalf("Nije moguće pingati MongoDB: %v", err)
 	}
 
 	MongoClient = client
-	log.Println("MongoDB connection established successfully")
+	log.Println("Veza s MongoDB uspješno uspostavljena")
 }
 
-// GetMongoCollection retrieves a collection from the database
+// GetMongoCollection dohvaća kolekciju iz baze podataka
 func GetMongoCollection(database, collection string) *mongo.Collection {
 	return MongoClient.Database(database).Collection(collection)
 }
