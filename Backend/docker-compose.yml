@@ -1,33 +1,48 @@
-version: '3.8'
+# docker-compose.yml
 
 services:
   traefik:
     image: traefik:v2.10
+    restart: unless-stopped
     command:
-      - "--api.insecure=false" # Omogućava API za testiranje (ukloni u produkciji)
+      - "--api.dashboard=true"
+      - "--api.insecure=false"
       - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.dashboard.address=:8080"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=dragojevicdobren@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.email=dragojevicdobren@gmail.com" 
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--log.level=INFO"
+      - "--accesslog=true"
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik-certificates:/letsencrypt
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard.eduformacije.com`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+      - "traefik.http.routers.dashboard.service=api@internal"
     networks:
       - default
 
   engine:
     build: .
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.engine.rule=Host(`engine.eduformacije.com`)"
       - "traefik.http.routers.engine.entrypoints=websecure"
       - "traefik.http.routers.engine.tls.certresolver=myresolver"
+      - "traefik.http.services.engine.loadbalancer.server.port=80"
     networks:
       - default
     env_file:
@@ -38,20 +53,41 @@ services:
 
   mongo:
     image: mongo
-    ports:
-      - "27017:27017"
+    restart: unless-stopped
     volumes:
       - mongo_data:/data/db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=example
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - default
 
   redis:
-    image: redis
-    ports:
-      - "6379:6379"
+    image: redis:6.2.6
+    restart: unless-stopped
     volumes:
       - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    sysctls:
+      net.core.somaxconn: '65535'
+    networks:
+      - default
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=false"
 
 volumes:
   mongo_data:
@@ -61,3 +97,4 @@ volumes:
 
 networks:
   default:
+    driver: bridge
