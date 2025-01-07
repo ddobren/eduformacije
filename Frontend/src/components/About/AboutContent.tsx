@@ -1,0 +1,53 @@
+import { Sparkles, TrendingUp, Lightbulb, Globe } from 'lucide-react';
+import { FeatureCard } from '../Home/FeatureCard';
+
+export const AboutContent = () => {
+    const features = [
+        {
+            icon: TrendingUp,
+            title: 'Naša misija',
+            description: 'Naša misija je da učenicima i roditeljima omogućimo pristup detaljnim informacijama o školama na intuitivan i jednostavan način, sa fokusom na AI preporuke.',
+        },
+        {
+            icon: Lightbulb,
+            title: 'Kako radimo',
+            description: 'Koristimo najnovije tehnologije za analizu podataka o školama i interesima korisnika kako bismo pružili najbolje moguće preporuke.',
+        },
+        {
+            icon: Globe,
+            title: 'Što nudimo',
+            description: 'Naša platforma omogućava korisnicima da istraže mogućnosti obrazovanja širom hrvatske, prema njihovim interesima i potrebama.',
+        },
+    ];
+
+    return (
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+            {/* Zaglavlje */}
+            <header className="text-center py-20 rounded-xl">
+                <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-primary-500/20 border border-primary-500/30 mb-6 hover:bg-primary-500/25 transition">
+                    <Sparkles className="w-5 h-5 text-primary-400" />
+                    <span className="text-base text-primary-400 font-medium">O aplikaciji</span>
+                </div>
+                <h1 className="text-5xl sm:text-6xl font-extrabold text-white mb-8 tracking-tight leading-tight">
+                    Dobrodošli u{' '}
+                    <span className="relative">
+                        <span className="bg-gradient-to-r from-red-600 via-white to-blue-600 bg-clip-text text-transparent animate-gradient-flow">
+                            Eduformacije
+                        </span>
+                    </span>
+                </h1>
+                <p className="text-lg sm:text-xl text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
+                    Eduformacije je platforma koja koristi najnovije tehnologije kako bi pomogla učenicima
+                    i roditeljima da pronađu idealnu školu prilagođenu njihovim interesima i potrebama.
+                </p>
+            </header>
+
+            {/* Sekcije */}
+            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                {features.map((feature, index) => (
+                    <FeatureCard key={index} Icon={feature.icon} title={feature.title} description={feature.description} />
+                ))}
+            </div>
+        </div>
+    );
+};

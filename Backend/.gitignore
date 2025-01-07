@@ -1,0 +1,4 @@
+# .gitignore Backend
+
+.env
+server.log
