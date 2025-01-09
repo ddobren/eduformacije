@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ddobren/eduformacije/config" // ili zamijenite s os.Getenv
+	"github.com/ddobren/eduformacije/config"
 	"github.com/ddobren/eduformacije/models"
 )
 

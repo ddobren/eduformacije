@@ -24,15 +24,15 @@ func InitMongo() {
 
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		log.Fatalf("Error connecting to MongoDB: %v", err)
+		log.Fatalf("Ne mogu se spojiti na MongoDB: %v", err)
 	}
 
 	if err := client.Ping(ctx, nil); err != nil {
-		log.Fatalf("Could not ping MongoDB: %v", err)
+		log.Fatalf("Ne mogu pingati MongoDB: %v", err)
 	}
 
 	MongoClient = client
-	log.Println("MongoDB connection established successfully")
+	log.Println("MongoDB konekcija uspješno uspostavljena")
 }
 
 func GetMongoCollection(database, collection string) *mongo.Collection {

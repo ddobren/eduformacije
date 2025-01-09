@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// GetSrednjeSkoleHandler - GET /api/v1/skole/srednje
-func GetSrednjeSkoleeHandler(c *gin.Context) {
+// GetSrednjeHandler - GET /api/v1/skole/srednje
+func GetSrednjeHandler(c *gin.Context) {
 	collection := database.GetMongoCollection("skole", "srednje")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -32,8 +32,8 @@ func GetSrednjeSkoleeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, results)
 }
 
-// GetOsnovneSkoleHandler - GET /api/v1/skole/osnovne
-func GetOsnovneSkoleHandler(c *gin.Context) {
+// GetOsnovneHandler - GET /api/v1/skole/osnovne
+func GetOsnovneHandler(c *gin.Context) {
 	collection := database.GetMongoCollection("skole", "osnovne")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

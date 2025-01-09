@@ -80,7 +80,7 @@ func UpdateSrednjeSkole() error {
 		return fmt.Errorf("greška pri spremanju srednjih škola u MongoDB: %w", err)
 	}
 
-	log.Printf("Uspješno ažurirani podaci za srednje škole (%d zapisa)", len(data))
+	log.Printf("Uspješno ažurirani podaci za srednje škole (%d zapisa) [MONGODB]", len(data))
 	return nil
 }
 
@@ -125,6 +125,6 @@ func UpdateOsnovneSkole() error {
 		return fmt.Errorf("greška pri spremanju osnovnih škola u MongoDB: %w", err)
 	}
 
-	log.Printf("Uspješno ažurirani podaci za osnovne škole (%d zapisa)", len(data))
+	log.Printf("Uspješno ažurirani podaci za osnovne škole (%d zapisa) [MONGODB]", len(data))
 	return nil
 }

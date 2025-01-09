@@ -28,7 +28,7 @@ func InitRedis() {
 	if _, err := rdb.Ping(ctx).Result(); err != nil {
 		log.Fatalf("Ne mogu se spojiti na Redis: %v", err)
 	} else {
-		log.Println("Veza s Redis uspješno uspostavljena")
+		log.Println("Redis konekcija uspješno uspostavljena")
 	}
 }
 

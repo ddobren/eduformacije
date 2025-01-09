@@ -27,7 +27,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			// Provjera algoritma tokena
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("nepodržani potpisni metod")
+				return nil, fmt.Errorf("nevažeći algoritam tokena: %v", token.Header["alg"])
 			}
 			return []byte(secretKey), nil
 		})

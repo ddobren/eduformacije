@@ -8,6 +8,7 @@ import (
 )
 
 // GenerateJWT - generira novi JWT token za autentifikaciju
+// Ova simple autentifikacija je urađena samo za preventiranje od abuse-a, nije bila nužna
 func GenerateJWT() (string, error) {
 	secretKey := config.GetEnv("API_SECRET", "")
 

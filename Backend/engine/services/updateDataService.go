@@ -42,6 +42,6 @@ func UpdateSkoleData() error {
 		return fmt.Errorf("greška pri spremanju u Redis: %w", err)
 	}
 
-	log.Printf("Uspješno ažuriran popis škola u Redis (%d škola)", len(skole))
+	log.Printf("Uspješno ažuriran popis škola (%d škola) [REDIS]", len(skole))
 	return nil
 }

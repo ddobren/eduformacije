@@ -126,8 +126,8 @@ func main() {
 		api.GET("/srednje-skole/zupanije", handlers.GetZupanijeHandler)
 		api.GET("/srednje-skole/mjesta", handlers.GetMjestaHandler)
 
-		api.GET("/skole/srednje", handlers.GetSrednjeSkoleeHandler)
-		api.GET("/skole/osnovne", handlers.GetOsnovneSkoleHandler)
+		api.GET("/skole/srednje", handlers.GetSrednjeHandler)
+		api.GET("/skole/osnovne", handlers.GetOsnovneHandler)
 
 		api.GET("/status", handlers.GetStatusHandler)
 	}
