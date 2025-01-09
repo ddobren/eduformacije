@@ -122,12 +122,12 @@ func main() {
 	api := r.Group("/api/v1", handlers.JWTAuthMiddleware())
 	{
 		api.POST("/srednje-skole/sugestije", handlers.PostSugestijeHandler)
-		api.GET("/srednje-skole", handlers.GetSrednjeSkoleHandler)
+		api.GET("/srednje-skole", handlers.GetSrednjeSkoleHandler) // Redis
 		api.GET("/srednje-skole/zupanije", handlers.GetZupanijeHandler)
 		api.GET("/srednje-skole/mjesta", handlers.GetMjestaHandler)
 
-		api.GET("/skole/srednje", handlers.GetSrednjeHandler)
-		api.GET("/skole/osnovne", handlers.GetOsnovneHandler)
+		api.GET("/skole/srednje", handlers.GetSrednjeHandler) // MongoDB
+		api.GET("/skole/osnovne", handlers.GetOsnovneHandler) // MongoDB
 
 		api.GET("/status", handlers.GetStatusHandler)
 	}

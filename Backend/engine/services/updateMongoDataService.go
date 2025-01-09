@@ -102,6 +102,7 @@ func UpdateOsnovneSkole() error {
 	for _, item := range data {
 		item["zupanija"] = item["zupnija"]
 		delete(item, "zupnija")
+		delete(item, "zupanija")
 	}
 
 	collection := database.GetMongoCollection("skole", "osnovne")
