@@ -8,6 +8,8 @@ import { Contact } from './pages/Contact';
 import { ToastContainer } from './components/common/ToastContainer';
 import { NotFound } from './pages/NotFound';
 import { Search } from './pages/Search';
+import FAQ from './pages/FAQ';
+import Privacy from './pages/Privacy';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +37,9 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/privacy" element={<Privacy />} />
 
             {/* 404 stranica */}
             <Route path="*" element={<NotFound />} />

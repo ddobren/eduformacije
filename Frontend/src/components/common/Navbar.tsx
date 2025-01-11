@@ -23,6 +23,7 @@ export const Navbar = () => {
               <Link to="/" className="text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors">Početna</Link>
               <Link to="/about" className="text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors">O nama</Link>
               <Link to="/contact" className="text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors">Kontakt</Link>
+              <Link to="/faq" className="text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors">FAQ</Link>
             </div>
           </div>
           <div className="md:hidden">
@@ -41,6 +42,7 @@ export const Navbar = () => {
             <Link to="/" className="block text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors">Početna</Link>
             <Link to="/about" className="text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors">O nama</Link>
             <Link to="/contact" className="block text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors">Kontakt</Link>
+            <Link to="/faq" className="block text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors">FAQ</Link>
           </div>
         </div>
       )}
