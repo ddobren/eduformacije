@@ -15,12 +15,20 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simuliraj učitavanje sadržaja (npr. 2 sekunde)
-    const timer = setTimeout(() => {
+    // Funkcija koja će se pozvati kada se stranica u potpunosti učita
+    const handleLoad = () => {
       setIsLoading(false);
-    }, 2000);
+    };
 
-    return () => clearTimeout(timer); // Očisti timer
+    // Provjeri je li stranica već učitana
+    if (document.readyState === 'complete') {
+      handleLoad();
+    } else {
+      window.addEventListener('load', handleLoad);
+    }
+
+    // Očisti event listener
+    return () => window.removeEventListener('load', handleLoad);
   }, []);
 
   return (
@@ -28,7 +36,7 @@ function App() {
       <ToastContainer />
 
       {isLoading ? (
-        <LoadingScreen /> // Prikaži loader
+        <LoadingScreen />
       ) : (
         <Router>
           <Routes>
@@ -37,11 +45,8 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-
             <Route path="/faq" element={<FAQ />} />
             <Route path="/privacy" element={<Privacy />} />
-
-            {/* 404 stranica */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
