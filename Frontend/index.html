@@ -1,13 +1,84 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="hr">
   <head>
+    <!-- Osnovne postavke -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/icon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Eduformacije</title>
+
+    <!-- Naslov i opis (Globalni SEO) -->
+    <title>Eduformacije - Najveći AI Pretraživač Škola u Hrvatskoj</title>
+    <meta
+      name="description"
+      content="Eduformacije je najveći i najnapredniji AI pretraživač škola u Hrvatskoj. Otkrijte idealnu srednju školu ili program uz personalizirane preporuke temeljem vaših interesa!"
+    />
+    <meta
+      name="keywords"
+      content="Eduformacije, AI, pretraživač škola, srednja škola, obrazovanje, Hrvatska, upisi, savjetnik"
+    />
+    <meta name="author" content="Dobren Dragojević" />
+
+    <!-- Favicons i Manifest (PWA) -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/favicon-96x96.png"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="EduF" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph (društvene mreže) -->
+    <meta 
+      property="og:title"
+      content="Eduformacije - Najveći AI Pretraživač Škola"
+    />
+    <meta
+      property="og:description"
+      content="S našim inovativnim AI sustavom, brzo pronađite idealnu srednju školu ili program. 
+               Dobivate personalizirane preporuke prema vašim interesima!"
+    />
+    <meta property="og:url" content="https://eduformacije.com" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://beta.eduformacije.com/og-image.png"
+    />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Eduformacije - Najveći AI Pretraživač Škola"
+    />
+    <meta
+      name="twitter:description"
+      content="Otkrijte idealnu srednju školu ili program uz pomoć AI savjetnika."
+    />
+    <meta
+      name="twitter:image"
+      content="https://beta.eduformacije.com/og-image.png"
+    />
+
+    <!-- Boja browser trake (na mobilnim uređajima) -->
+    <meta name="theme-color" content="#000000" />
   </head>
   <body>
+    <!-- Upozorenje ako je korisnik onemogućio JavaScript -->
+    <noscript>
+      Potrebno je omogućiti JavaScript da biste koristili ovu aplikaciju.
+    </noscript>
+
+    <!-- React mount point -->
     <div id="root"></div>
+
+    <!-- Učitaj glavni React skript -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
