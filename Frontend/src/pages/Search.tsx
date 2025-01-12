@@ -1,63 +1,114 @@
-// src/pages/Search.tsx
 
 import React, { useEffect, useState } from 'react';
 import { SearchForm } from '../components/Search/SearchForm';
 import LoadingState from '../components/Search/LoadingState';
-import { Results } from '../components/Search/Results/Result'; // Ispravljen uvoz
+import { Results } from '../components/Search/Results/Result';
 import { School } from '../types/search';
 import { Navbar } from '../components/common/Navbar';
 import { Footer } from '../components/common/Footer';
 import { AnimatedBackground } from '../components/common/AnimatedBackground';
+import { motion, AnimatePresence } from 'framer-motion';
+import Pagination from '../components/Find/Results/Pagination';
+
+const ITEMS_PER_PAGE = 10;
 
 export const Search: React.FC = () => {
     useEffect(() => {
-        window.scrollTo(0, 0); // Skrolaj na vrh (x: 0, y: 0)
+        window.scrollTo(0, 0);
     }, []);
 
     const [isSearching, setIsSearching] = useState<boolean>(false);
-    const [searchResults, setSearchResults] = useState<School[] | null>(null);
+    const [allSearchResults, setAllSearchResults] = useState<School[] | null>(null);
+    const [currentPage, setCurrentPage] = useState<number>(1);
 
     const handleSearchStart = () => {
         setIsSearching(true);
+        setCurrentPage(1);
     };
 
     const handleSearchComplete = (results: School[] | null) => {
         setIsSearching(false);
-        setSearchResults(results);
+        setAllSearchResults(results);
     };
 
     const handleReset = () => {
-        setSearchResults(null);
+        setAllSearchResults(null);
+        setCurrentPage(1);
     };
 
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo(0, 0);
+    };
+
+    const paginatedResults = allSearchResults
+        ? allSearchResults.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+        : null;
+
+    const totalPages = allSearchResults ? Math.ceil(allSearchResults.length / ITEMS_PER_PAGE) : 0;
+
     return (
-        <>
-            <div className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 overflow-x-hidden">
-                <Navbar />
-                <div className="relative min-h-screen pt-20">
-                    <AnimatedBackground />
-                    <div className='relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
-                        {!isSearching && !searchResults && (
-                            <SearchForm
-                                onSearchStart={handleSearchStart}
-                                onSearchComplete={handleSearchComplete}
-                            />
-                        )}
+  <>
+    <div className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 overflow-x-hidden">
+      <Navbar />
+      <div className="relative min-h-screen pt-20 pb-12">
+        <AnimatedBackground />
+        <div className='relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+          <AnimatePresence mode="wait">
+            {!isSearching && !allSearchResults && (
+              <motion.div
+                key="search-form"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+              >
+                <SearchForm
+                  onSearchStart={handleSearchStart}
+                  onSearchComplete={handleSearchComplete}
+                />
+              </motion.div>
+            )}
 
-                        {isSearching && <LoadingState />}
+            {isSearching && (
+              <motion.div
+                key="loading-state"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <LoadingState />
+              </motion.div>
+            )}
 
-                        {searchResults && !isSearching && (
-                            <Results
-                                schools={searchResults}
-                                onReset={handleReset}
-                            />
-                        )}
-                    </div>
-                </div>
-                <Footer />
-            </div>
-        </>
-    );
+            {allSearchResults && !isSearching && (
+              <motion.div
+                key="results"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Results
+                  schools={paginatedResults || []}
+                  onReset={handleReset}
+                />
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  </>
+);
 };
 
 export default Search;
+

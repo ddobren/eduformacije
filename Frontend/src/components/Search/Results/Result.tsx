@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { School } from '../../../types/search';
-import { MapPin, Phone, Mail, Globe } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { MapPin, Phone, Mail, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GradientButton } from '../../common/GradientButton';
 
 interface ResultsProps {
@@ -17,19 +17,14 @@ export const Results: React.FC<ResultsProps> = ({ schools, onReset }) => {
     return url;
   };
 
-  const [expandedEmails, setExpandedEmails] = useState<Record<string, boolean>>({});
-  const [expandedPhones, setExpandedPhones] = useState<Record<string, boolean>>({});
+  const [expandedSchools, setExpandedSchools] = useState<Record<string, boolean>>({});
 
-  const toggleEmails = (schoolId: string) => {
-    setExpandedEmails((prev) => ({ ...prev, [schoolId]: !prev[schoolId] }));
-  };
-
-  const togglePhones = (schoolId: string) => {
-    setExpandedPhones((prev) => ({ ...prev, [schoolId]: !prev[schoolId] }));
+  const toggleSchoolExpansion = (schoolId: string) => {
+    setExpandedSchools((prev) => ({ ...prev, [schoolId]: !prev[schoolId] }));
   };
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="w-full">
       <motion.div
         className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12"
         initial={{ opacity: 0 }}
@@ -59,109 +54,88 @@ export const Results: React.FC<ResultsProps> = ({ schools, onReset }) => {
 
           {schools.length > 0 ? (
             <div className="space-y-6 sm:space-y-8">
-              {schools.map((school) => {
-                const allEmails = school.ePošta
-                  ? school.ePošta.split(/[,;]+/).map((e) => e.trim()).filter(Boolean)
-                  : [];
+              {schools.map((school) => (
+                <motion.div
+                  key={school._id}
+                  className="bg-gray-800/70 rounded-xl p-4 sm:p-6 shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:bg-gray-800/90"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-white break-words">
+                      {school.Naziv}
+                      <span className="block sm:inline text-sm text-gray-400 sm:ml-2">
+                        {school.Mjesto}
+                      </span>
+                    </h3>
+                    <button
+                      onClick={() => toggleSchoolExpansion(school._id)}
+                      className="text-primary-400 hover:text-primary-300 transition-colors"
+                    >
+                      {expandedSchools[school._id] ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+                    </button>
+                  </div>
 
-                const allPhones = school.Telefon
-                  ? school.Telefon.split(/[,;]+/).map((p) => p.trim()).filter(Boolean)
-                  : [];
-
-                return (
-                  <motion.div
-                    key={school._id}
-                    className="bg-gray-800/70 rounded-xl p-4 sm:p-6 shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:bg-gray-800/90"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                  >
-                    <h3 className="text-xl sm:text-2xl font-semibold text-white mb-4 break-words">{school.Naziv}</h3>
-
-                    <div className="space-y-4 text-gray-300">
-                      <div className="flex items-start gap-3">
-                        <MapPin className="w-5 h-5 text-primary-400 flex-shrink-0 mt-1" />
-                        <span className="text-base sm:text-lg break-words">
-                          {school.Adresa},
-                          <br className="sm:hidden" /> {school.PoštanskiBroj} {school.Mjesto}
-                        </span>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <Phone className="w-5 h-5 text-primary-400 flex-shrink-0 mt-1" />
-                        <div className="flex flex-col">
-                          {allPhones.length === 0 ? (
-                            <span className="text-sm italic text-gray-500">Nema broja telefona</span>
-                          ) : (
-                            <>
-                              {allPhones.slice(0, expandedPhones[school._id] ? allPhones.length : 1).map((phone, idx) => (
-                                <a 
-                                  key={idx} 
-                                  href={`tel:${phone.replace(/\s+/g, '')}`}
-                                  className="text-base sm:text-lg hover:text-primary-400 transition-colors break-words"
-                                >
-                                  {phone}
-                                </a>
-                              ))}
-                              {allPhones.length > 1 && (
-                                <button
-                                  onClick={() => togglePhones(school._id)}
-                                  className="mt-2 text-sm text-primary-400 hover:underline focus:outline-none"
-                                >
-                                  {expandedPhones[school._id] ? 'Prikaži manje' : `Prikaži sve (${allPhones.length})`}
-                                </button>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <Mail className="w-5 h-5 text-primary-400 flex-shrink-0 mt-1" />
-                        <div className="flex flex-col">
-                          {allEmails.length === 0 ? (
-                            <span className="text-sm italic text-gray-500">Nema email adrese</span>
-                          ) : (
-                            <>
-                              {allEmails.slice(0, expandedEmails[school._id] ? allEmails.length : 1).map((email, idx) => (
-                                <a 
-                                  key={idx} 
-                                  href={`mailto:${email}`} 
-                                  className="text-base sm:text-lg hover:text-primary-400 transition-colors underline break-words"
-                                >
-                                  {email}
-                                </a>
-                              ))}
-                              {allEmails.length > 1 && (
-                                <button
-                                  onClick={() => toggleEmails(school._id)}
-                                  className="mt-2 text-sm text-primary-400 hover:underline focus:outline-none"
-                                >
-                                  {expandedEmails[school._id] ? 'Prikaži manje' : `Prikaži sve (${allEmails.length})`}
-                                </button>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      {school.Web && (
+                  <AnimatePresence>
+                    {expandedSchools[school._id] && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-4 space-y-4 text-gray-300 overflow-hidden"
+                      >
                         <div className="flex items-start gap-3">
-                          <Globe className="w-5 h-5 text-primary-400 flex-shrink-0 mt-1" />
-                          <a 
-                            href={ensureHttp(school.Web)} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-base sm:text-lg hover:text-primary-400 transition-colors break-words"
-                          >
-                            {school.Web}
-                          </a>
+                          <MapPin className="w-5 h-5 text-primary-400 flex-shrink-0 mt-1" />
+                          <span className="text-base sm:text-lg break-words">
+                            {school.Adresa},
+                            <br className="sm:hidden" /> {school.PoštanskiBroj} {school.Mjesto}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  </motion.div>
-                );
-              })}
+
+                        {school.Telefon && (
+                          <div className="flex items-start gap-3">
+                            <Phone className="w-5 h-5 text-primary-400 flex-shrink-0 mt-1" />
+                            <a 
+                              href={`tel:${school.Telefon.replace(/\s+/g, '')}`}
+                              className="text-base sm:text-lg hover:text-primary-400 transition-colors break-words"
+                            >
+                              {school.Telefon}
+                            </a>
+                          </div>
+                        )}
+
+                        {school.ePošta && (
+                          <div className="flex items-start gap-3">
+                            <Mail className="w-5 h-5 text-primary-400 flex-shrink-0 mt-1" />
+                            <a 
+                              href={`mailto:${school.ePošta}`} 
+                              className="text-base sm:text-lg hover:text-primary-400 transition-colors underline break-words"
+                            >
+                              {school.ePošta}
+                            </a>
+                          </div>
+                        )}
+
+                        {school.Web && (
+                          <div className="flex items-start gap-3">
+                            <Globe className="w-5 h-5 text-primary-400 flex-shrink-0 mt-1" />
+                            <a 
+                              href={ensureHttp(school.Web)} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-base sm:text-lg hover:text-primary-400 transition-colors break-words"
+                            >
+                              {school.Web}
+                            </a>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))}
             </div>
           ) : (
             <p className="text-center text-gray-400 text-lg sm:text-xl font-medium">
