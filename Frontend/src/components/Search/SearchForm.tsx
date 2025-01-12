@@ -17,14 +17,41 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [suggestions, setSuggestions] = useState<School[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fuse = useRef<Fuse<School> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionRef = useRef<HTMLDivElement>(null);
+
+  // Detect mobile devices
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Handle clicks outside suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        suggestionRef.current &&
+        !suggestionRef.current.contains(event.target as Node) &&
+        !inputRef.current?.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchAllSchools = async () => {
       try {
-        // 1) Provjerimo postoji li nešto u cacheu
         const cachedData = localStorage.getItem("allSchools");
         if (cachedData) {
           const parsedData: School[] = JSON.parse(cachedData);
@@ -49,11 +76,8 @@ export const SearchForm: React.FC<SearchFormProps> = ({
           }),
         ]);
 
-        if (!responseOsnovne.ok) {
-          throw new Error("Greška prilikom dohvaćanja osnovnih škola.");
-        }
-        if (!responseSrednje.ok) {
-          throw new Error("Greška prilikom dohvaćanja srednjih škola.");
+        if (!responseOsnovne.ok || !responseSrednje.ok) {
+          throw new Error("Greška prilikom dohvaćanja škola.");
         }
 
         const [osnovneSkole, srednjeSkole] = await Promise.all([
@@ -62,7 +86,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         ]);
 
         const combinedData: School[] = [...osnovneSkole, ...srednjeSkole];
-
         localStorage.setItem("allSchools", JSON.stringify(combinedData));
         initializeFuse(combinedData);
       } catch {
@@ -110,16 +133,30 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     }
 
     debounceTimeout.current = setTimeout(() => {
-      if (fuse.current) {
+      if (fuse.current && value.trim()) {
         const results = fuse.current.search(value, { limit: 5 });
         setSuggestions(results.map((result) => result.item));
+      } else {
+        setSuggestions([]);
       }
     }, 300);
   };
 
+  const handleInputFocus = () => {
+    if (searchTerm.trim()) {
+      setShowSuggestions(true);
+    }
+    // Scroll to input on mobile
+    if (isMobile) {
+      setTimeout(() => {
+        inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
+
   return (
     <motion.div
-      className="w-full max-w-4xl mx-auto px-3 sm:px-6 lg:px-8"
+      className="w-full max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 relative"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -165,10 +202,12 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                 placeholder="Pronađi svoju školu..."
                 value={searchTerm}
                 onChange={handleInputChange}
+                onFocus={handleInputFocus}
                 className="w-full px-4 sm:px-6 py-3 sm:py-4 
                            text-base sm:text-lg bg-gray-900 text-white 
                            rounded-l-full focus:outline-none 
-                           placeholder-gray-400"
+                           placeholder-gray-400 appearance-none"
+                style={{ WebkitAppearance: 'none' }}
               />
               <button
                 type="submit"
@@ -177,9 +216,10 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                            bg-gradient-to-r from-primary-400 
                            via-primary-500 to-primary-600 
                            text-white rounded-full 
-                           hover:opacity-90 
+                           hover:opacity-90 active:opacity-80
                            transition-opacity duration-300 
-                           flex items-center justify-center gap-2"
+                           flex items-center justify-center gap-2
+                           touch-manipulation"
               >
                 <Search className="w-4 h-4 flex-shrink-0 transition-colors" />
                 <span className="hidden sm:inline">Pretraži</span>
@@ -192,15 +232,20 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         <AnimatePresence>
           {showSuggestions && suggestions.length > 0 && (
             <motion.div
+              ref={suggestionRef}
               className="fixed sm:absolute left-0 right-0 sm:w-full 
                          mt-2 sm:mt-4 mx-3 sm:mx-0 z-50"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
+              style={{
+                top: isMobile ? '50%' : 'auto',
+                transform: isMobile ? 'translateY(-50%)' : 'none'
+              }}
             >
               <div
-                className="bg-gray-900 rounded-2xl shadow-xl 
+                className="bg-gray-900/95 rounded-2xl shadow-xl 
                            border border-gray-800/50 backdrop-blur-lg 
                            overflow-hidden max-h-[60vh] sm:max-h-[400px] 
                            overflow-y-auto"
@@ -219,11 +264,16 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                         className="w-full px-4 sm:px-6 py-4 
                                    text-left flex items-center gap-3 
                                    sm:gap-4 text-gray-300 hover:text-white 
-                                   transition-colors"
+                                   transition-colors active:bg-gray-800/50"
                         onClick={() => {
                           setSearchTerm(suggestion.Naziv);
                           setShowSuggestions(false);
-                          if (inputRef.current) inputRef.current.focus();
+                          if (inputRef.current) {
+                            inputRef.current.focus();
+                            if (isMobile) {
+                              inputRef.current.blur(); // Hide keyboard on mobile after selection
+                            }
+                          }
                         }}
                       >
                         <div className="min-w-0 flex-1">

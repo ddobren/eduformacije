@@ -7,16 +7,15 @@ import { AnimatedBackground } from "../components/common/AnimatedBackground";
 
 const FAQ = () => {
   useEffect(() => {
-    window.scrollTo(0, 0); // Skrolaj na vrh (x: 0, y: 0)
+    window.scrollTo(0, 0);
   }, []);
 
   return (
     <>
       <Navbar />
-      <div className="relative min-h-screen bg-gray-900 px-4 sm:px-6 lg:px-8 py-12">
-        {/* Animated Background */}
+      <div className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
         <AnimatedBackground />
-        <div className="max-w-3xl lg:max-w-4xl mx-auto bg-gray-900/30 backdrop-blur-md p-6 sm:p-8 md:p-10 rounded-xl border border-gray-800/50 shadow-xl mt-12">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
           <FAQHeader />
           <FAQList />
         </div>
@@ -27,3 +26,4 @@ const FAQ = () => {
 };
 
 export default FAQ;
+
