@@ -24,18 +24,47 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   useEffect(() => {
     const fetchAllSchools = async () => {
       try {
+        // 1) Provjerimo postoji li nešto u cacheu
         const cachedData = localStorage.getItem("allSchools");
         if (cachedData) {
           const parsedData: School[] = JSON.parse(cachedData);
           initializeFuse(parsedData);
           return;
         }
-        const response = await fetch(
-          "https://engine.eduformacije.com/api/v1/skole"
-        );
-        const data: School[] = await response.json();
-        localStorage.setItem("allSchools", JSON.stringify(data));
-        initializeFuse(data);
+
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.4rz5eH4rojtUQSPI8CcroOf4CRJjo6N9_HQAI_9e1t0";
+
+        const [responseOsnovne, responseSrednje] = await Promise.all([
+          fetch("https://engine.eduformacije.com/api/v1/skole/osnovne", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }),
+          fetch("https://engine.eduformacije.com/api/v1/skole/srednje", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }),
+        ]);
+
+        if (!responseOsnovne.ok) {
+          throw new Error("Greška prilikom dohvaćanja osnovnih škola.");
+        }
+        if (!responseSrednje.ok) {
+          throw new Error("Greška prilikom dohvaćanja srednjih škola.");
+        }
+
+        const [osnovneSkole, srednjeSkole] = await Promise.all([
+          responseOsnovne.json(),
+          responseSrednje.json(),
+        ]);
+
+        const combinedData: School[] = [...osnovneSkole, ...srednjeSkole];
+
+        localStorage.setItem("allSchools", JSON.stringify(combinedData));
+        initializeFuse(combinedData);
       } catch {
         toast.error("Greška prilikom učitavanja podataka.");
       }
@@ -97,7 +126,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     >
       {/* Logo + opis */}
       <div className="flex flex-col items-center space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-        {/* Umetnemo hr logo */}
         <motion.h1
           className="font-bold text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-1"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -107,11 +135,14 @@ export const SearchForm: React.FC<SearchFormProps> = ({
           Edu<span className="text-primary-400">formacije</span>
         </motion.h1>
         <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto px-4 text-center">
-          Pretražite sve škole u <span className="bg-gradient-to-r from-red-500 via-white to-blue-500 bg-clip-text text-transparent font-bold">Hrvatskoj</span> na jednom mjestu.
+          Pretražite sve škole u{" "}
+          <span className="bg-gradient-to-r from-red-500 via-white to-blue-500 bg-clip-text text-transparent font-bold">
+            Hrvatskoj
+          </span>{" "}
+          na jednom mjestu.
         </p>
       </div>
 
-      {/* Forma za pretragu */}
       <form
         onSubmit={handleSearch}
         className="relative max-w-3xl mx-auto"
