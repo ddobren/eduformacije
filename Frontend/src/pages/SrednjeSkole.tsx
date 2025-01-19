@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { SchoolTable } from "../components/SrednjeSkole/SchoolTable";
 import { Navbar } from "../components/common/Navbar";
 import { AnimatedBackground } from "../components/common/AnimatedBackground";
 import { Footer } from "../components/common/Footer";
 import LoadingSchools from "../components/SrednjeSkole/LoadingSchools";
+import EnhancedSchoolTable from "../components/SrednjeSkole/SchoolTable";
 
 interface School {
   Program: string;
@@ -53,7 +53,8 @@ export const SrednjeSkole: React.FC = () => {
         <div className="relative min-h-screen pt-20">
           <AnimatedBackground />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            {loading ? <LoadingSchools /> : <SchoolTable schools={schools} />}
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-8 text-center">Srednje Škole</h1>
+            {loading ? <LoadingSchools /> : <EnhancedSchoolTable schools={schools} />}
           </div>
         </div>
         <Footer />
@@ -61,3 +62,4 @@ export const SrednjeSkole: React.FC = () => {
     </>
   );
 };
+
