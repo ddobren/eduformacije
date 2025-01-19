@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search } from "lucide-react";
+import { Search } from 'lucide-react';
 import { toast } from "../../utils/toast";
 import { School } from "../../types/search";
 import Fuse from "fuse.js";
@@ -18,12 +18,12 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const [suggestions, setSuggestions] = useState<School[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+
   const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fuse = useRef<Fuse<School> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionRef = useRef<HTMLDivElement>(null);
 
-  // Detect mobile devices
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -33,7 +33,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Handle clicks outside suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -146,7 +145,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     if (searchTerm.trim()) {
       setShowSuggestions(true);
     }
-    // Scroll to input on mobile
     if (isMobile) {
       setTimeout(() => {
         inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -156,22 +154,21 @@ export const SearchForm: React.FC<SearchFormProps> = ({
 
   return (
     <motion.div
-      className="w-full max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 relative"
+      className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Logo + opis */}
-      <div className="flex flex-col items-center space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+      <div className="flex flex-col items-center space-y-4 sm:space-y-6 mb-6 sm:mb-8">
         <motion.h1
-          className="font-bold text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-1"
+          className="font-bold text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
           Edu<span className="text-primary-400">formacije</span>
         </motion.h1>
-        <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto px-4 text-center">
+        <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto text-center">
           Pretražite sve škole u{" "}
           <span className="bg-gradient-to-r from-red-500 via-white to-blue-500 bg-clip-text text-transparent font-bold">
             Hrvatskoj
@@ -190,7 +187,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
             className="absolute inset-0 bg-gradient-to-r from-primary-400 
                        via-primary-500 to-primary-600 rounded-full blur-md 
                        opacity-75 group-hover:opacity-100 
-                       transition-opacity duration-300"
+                       transition-opacity duration-300 pointer-events-none"
           />
           <div className="relative bg-gray-900 rounded-full p-1">
             <div className="flex items-center">
@@ -228,7 +225,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
           </div>
         </div>
 
-        {/* Sugestije */}
         <AnimatePresence>
           {showSuggestions && suggestions.length > 0 && (
             <motion.div
@@ -241,7 +237,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
               transition={{ duration: 0.2 }}
               style={{
                 top: isMobile ? '50%' : 'auto',
-                transform: isMobile ? 'translateY(-50%)' : 'none'
+                transform: isMobile ? 'translateY(-50%)' : 'none',
               }}
             >
               <div
@@ -266,12 +262,17 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                                    sm:gap-4 text-gray-300 hover:text-white 
                                    transition-colors active:bg-gray-800/50"
                         onClick={() => {
+                          // 1. Postavi tekst u input
                           setSearchTerm(suggestion.Naziv);
+                          // 2. Zatvori dropdown
                           setShowSuggestions(false);
+                          // 3. Očisti listu sugestija
+                          setSuggestions([]);
+                          // 4. (Neobavezno) vrati fokus, ili makni fokus na mobitelu
                           if (inputRef.current) {
                             inputRef.current.focus();
                             if (isMobile) {
-                              inputRef.current.blur(); // Hide keyboard on mobile after selection
+                              inputRef.current.blur();
                             }
                           }
                         }}
@@ -293,8 +294,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Donji info */}
-        <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-500 px-4">
+        <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-500">
           Pretraži informacije od preko{" "}
           <span className="text-primary-400 font-semibold">1000+</span> škola
         </div>

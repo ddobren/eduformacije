@@ -1,6 +1,6 @@
-import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface PaginationProps {
   currentPage: number;
@@ -8,8 +8,28 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}) => {
   if (totalPages < 1) return null;
+
+  // Helper to calculate the page numbers to display
+  const calculatePageNumbers = () => {
+    const visiblePages = 3; // You can adjust this to show more or fewer pages
+    let start = Math.max(currentPage - Math.floor(visiblePages / 2), 1);
+    let end = start + visiblePages - 1;
+
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - visiblePages + 1);
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  };
+
+  const pageNumbers = calculatePageNumbers();
 
   return (
     <motion.div
@@ -19,16 +39,15 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       transition={{ duration: 0.5 }}
     >
       <motion.button
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
         className="p-3 rounded-full bg-gray-800 text-white hover:bg-primary-500 transition-transform transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-        aria-label="Prethodna stranica"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
       >
         <ChevronLeft className="w-5 h-5" />
       </motion.button>
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+      {pageNumbers.map(page => (
         <motion.button
           key={page}
           onClick={() => onPageChange(page)}
@@ -45,10 +64,9 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
         </motion.button>
       ))}
       <motion.button
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
         className="p-3 rounded-full bg-gray-800 text-white hover:bg-primary-500 transition-transform transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-        aria-label="Sljedeća stranica"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
       >

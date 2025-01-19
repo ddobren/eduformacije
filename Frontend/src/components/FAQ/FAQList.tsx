@@ -1,16 +1,16 @@
-import { motion } from 'framer-motion';
-import faqs from './faq';
-import FAQItem from './FAQItem';
+import { motion } from "framer-motion";
+import faqData from "./faq";
+import FAQItem from "./FAQItem";
 
 const FAQList = () => {
   return (
-    <motion.div 
-      className="space-y-6 sm:space-y-8 max-w-4xl mx-auto"
+    <motion.div
+      className="space-y-4 sm:space-y-6 max-w-4xl mx-auto"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {faqs.map((faq, index) => (
+      {faqData.map((faq, index) => (
         <motion.div
           key={index}
           initial={{ opacity: 0, y: 20 }}
@@ -25,4 +25,3 @@ const FAQList = () => {
 };
 
 export default FAQList;
-

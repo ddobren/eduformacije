@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Search, Sparkles, AlertCircle, FilterIcon } from 'lucide-react';
 import { CountySelect } from './CountySelect';
 import { CitySelect } from './CitySelect';
@@ -10,13 +10,15 @@ const MAX_CHARS = 200;
 
 interface SearchFormProps {
   onSearchStart: () => void;
-  onSearchComplete: (results: { 
-    objasnjenje: string; 
-    programi: { 
-      skolaProgramRokId: string; 
-      program: string 
-    }[] 
-  } | null) => void;
+  onSearchComplete: (
+    results: { 
+      objasnjenje: string; 
+      programi: { 
+        skolaProgramRokId: string; 
+        program: string 
+      }[] 
+    } | null
+  ) => void;
 }
 
 export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps) => {
@@ -25,6 +27,7 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
   const [selectedCity, setSelectedCity] = useState('');
   const [hasEntranceExam, setHasEntranceExam] = useState<boolean | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleInterestsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
@@ -32,6 +35,22 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
       setInterests(text);
     }
   };
+
+  useEffect(() => {
+    const adjustTextareaHeight = () => {
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      }
+    };
+
+    adjustTextareaHeight();
+    window.addEventListener('resize', adjustTextareaHeight);
+
+    return () => {
+      window.removeEventListener('resize', adjustTextareaHeight);
+    };
+  }, [interests]);
 
   const charsRemaining = MAX_CHARS - interests.length;
   const isNearLimit = charsRemaining <= 20;
@@ -44,7 +63,7 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
       return;
     }
 
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.4rz5eH4rojtUQSPI8CcroOf4CRJjo6N9_HQAI_9e1t0';
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.4rz5eH4rojtUQSPI8CcroOf4CRJjo6N9_HQAI_9e1t0";
 
     const params = new URLSearchParams();
     if (selectedCounty) params.append('zupanija', selectedCounty);
@@ -96,7 +115,7 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
       const suggestions = await suggestionsResponse.json();
       onSearchComplete(suggestions);
       console.log(suggestions);
-      
+
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Došlo je do greške.');
       onSearchComplete(null);
@@ -104,98 +123,105 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 sm:px-6">
-      <form onSubmit={handleSubmit} className="relative">
-        <div className="bg-gradient-to-b from-gray-900/80 to-gray-900/95 backdrop-blur-xl rounded-2xl border border-gray-800/50 shadow-2xl">
-          {/* Header Section */}
-          <div className="px-4 sm:px-6 pt-6 pb-4 border-b border-gray-800/30">
-            <div className="flex items-center justify-between">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20">
-                <Sparkles className="w-3.5 h-3.5 text-primary-400" />
-                <span className="text-xs font-medium text-primary-400">AI asistent</span>
-              </div>
-              <span className={`text-xs ${isNearLimit ? 'text-orange-400' : 'text-gray-400'}`}>
-                {charsRemaining} znakova
-              </span>
-            </div>
-          </div>
-
-          {/* Main Content */}
-            <div className="p-4 sm:p-6 space-y-6">
-            {/* Interests Section */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-white/90">
-              Opiši svoje interese i želje
-              </label>
-              <div className="relative">
-              <textarea
-                value={interests}
-                onChange={handleInterestsChange}
-                autoComplete="off"
-                spellCheck={false}
-                className="w-full h-28 px-4 py-3 bg-gray-800/40 border border-gray-700/50 rounded-xl
-                focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 resize-none
-                text-white placeholder-gray-500 text-sm transition-all outline-none"
-                placeholder="Npr: Zanima me fitness i zdrav način života. Volio/la bih postati personalni trener..."
-              />
-              {isNearLimit && (
-                <div className="absolute bottom-2 right-2 flex items-center gap-1.5 text-orange-400">
-                <AlertCircle className="w-4 h-4" />
+    <div className="w-full overflow-x-hidden"> 
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <form onSubmit={handleSubmit} className="relative">
+          <div className="bg-gradient-to-b from-gray-900/80 to-gray-900/95 backdrop-blur-xl rounded-2xl border border-gray-800/50 shadow-2xl">
+            {/* Header Section */}
+            <div className="px-4 sm:px-6 pt-6 pb-4 border-b border-gray-800/30">
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20">
+                  <Sparkles className="w-3.5 h-3.5 text-primary-400" />
+                  <span className="text-xs font-medium text-primary-400">AI asistent</span>
                 </div>
-              )}
+                <span 
+                  className={`text-xs ${isNearLimit ? 'text-orange-400' : 'text-gray-400'}`}
+                >
+                  {charsRemaining} znakova
+                </span>
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed">
-              Što više detalja pružiš o svojim interesima i hobijima, to ćemo ti preciznije pomoći pronaći idealnu školu.
-              </p>
             </div>
 
-            {/* Filters Section */}
-            <div className="space-y-4">
+            {/* Main Content */}
+            <div className="p-4 sm:p-6 space-y-6">
+              {/* Interests Section */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-white/90">
+                  Opiši svoje interese i želje
+                </label>
+                <div className="relative">
+                  <textarea
+                    ref={textareaRef}
+                    value={interests}
+                    onChange={handleInterestsChange}
+                    autoComplete="off"
+                    spellCheck={false}
+                    className="w-full min-h-[112px] px-4 py-3 bg-gray-800/40 border border-gray-700/50 rounded-xl
+                    focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 resize-none
+                    text-white placeholder-gray-500 text-sm md:text-base transition-all outline-none overflow-hidden
+                    md:leading-6"
+                    style={{ fontSize: '16px' }} 
+                    placeholder="Npr: Zanima me fitness i zdrav način života. Volio/la bih postati personalni trener..."
+                  />
+                  {isNearLimit && (
+                    <div className="absolute bottom-2 right-2 flex items-center gap-1.5 text-orange-400">
+                      <AlertCircle className="w-4 h-4" />
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  Što više detalja pružiš o svojim interesima i hobijima, to ćemo ti preciznije pomoći pronaći idealnu školu.
+                </p>
+              </div>
+
+              {/* Filters Section */}
+              <div className="space-y-4">
                 <button
-                type="button"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center justify-between w-full px-4 py-2.5 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors border border-primary-700"
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="flex items-center justify-between w-full px-4 py-2.5 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors border border-gray-700/50"
                 >
-  <div className="flex items-center gap-2">
-    <FilterIcon className="w-4 h-4 text-gray-400" />
-    <span className="text-sm font-medium text-white/90">Dodatni filtri</span>
-  </div>
-                <svg
-                className={`w-5 h-5 text-white transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                  <div className="flex items-center gap-2">
+                    <FilterIcon className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm font-medium text-white/90">Dodatni filtri</span>
+                  </div>
+                  <svg
+                    className={`w-5 h-5 text-white transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
-              
-              {isExpanded && (
-              <div className="space-y-4 bg-gray-800/30 p-4 rounded-lg animate-fadeIn">
-                <CountySelect value={selectedCounty} onChange={setSelectedCounty} />
-                <CitySelect 
-                value={selectedCity} 
-                onChange={setSelectedCity} 
-                countyId={selectedCounty}
-                />
-                <EntranceExamSelect 
-                value={hasEntranceExam} 
-                onChange={setHasEntranceExam}
-                />
+
+                {isExpanded && (
+                  <div className="space-y-4 bg-gray-800/30 p-4 rounded-lg animate-fadeIn">
+                    <CountySelect value={selectedCounty} onChange={setSelectedCounty} />
+                    <CitySelect 
+                      value={selectedCity} 
+                      onChange={setSelectedCity} 
+                      countyId={selectedCounty}
+                    />
+                    <EntranceExamSelect 
+                      value={hasEntranceExam} 
+                      onChange={setHasEntranceExam}
+                    />
+                  </div>
+                )}
               </div>
-              )}
-            </div>
             </div>
 
-          {/* Footer/Submit Section */}
-          <div className="px-4 sm:px-6 py-4 border-t border-gray-800/30">
-            <GradientButton className="w-full py-3 text-sm font-medium">
-              <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              <span className="ml-2">Pronađi škole</span>
-            </GradientButton>
+            {/* Footer/Submit Section */}
+            <div className="px-4 sm:px-6 py-4 border-t border-gray-800/30">
+              <GradientButton className="w-full py-3 text-sm font-medium">
+                <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span className="ml-2">Pronađi škole</span>
+              </GradientButton>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

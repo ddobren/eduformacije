@@ -19,6 +19,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -42,6 +43,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       </label>
       <div className="relative">
         <input
+          ref={inputRef}
           type="text"
           value={search}
           onChange={(e) => {
@@ -71,6 +73,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   onChange(option);
                   setSearch('');
                   setIsOpen(false);
+                  inputRef.current?.blur();
                 }}
                 className="w-full px-4 py-2.5 text-base text-left text-white hover:bg-gray-800/50 
                   focus:bg-gray-800/50 focus:outline-none transition-colors"
@@ -94,3 +97,4 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     </div>
   );
 };
+

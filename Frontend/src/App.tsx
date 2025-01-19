@@ -10,6 +10,7 @@ import { NotFound } from './pages/NotFound';
 import { Search } from './pages/Search';
 import FAQ from './pages/FAQ';
 import Privacy from './pages/Privacy';
+import { SrednjeSkole } from './pages/SrednjeSkole';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -46,6 +47,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
+            <Route path="/srednje-skole" element={<SrednjeSkole />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
