@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Search, SlidersHorizontal, X, FileX } from 'lucide-react';
 import Pagination from '../Find/Results/Pagination';
 import { motion, AnimatePresence } from 'framer-motion';
-
 interface School {
   Program: string;
   Skola: string;
@@ -25,13 +24,12 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const itemsPerPage = 10;
 
-  // Extract unique values for filters
-  const zupanije = useMemo(() => 
+  const zupanije = useMemo(() =>
     Array.from(new Set(schools.map(school => school.Zupanija))).sort(),
     [schools]
   );
-  
-  const trajanja = useMemo(() => 
+
+  const trajanja = useMemo(() =>
     Array.from(new Set(schools.map(school => school.Trajanje))).sort(),
     [schools]
   );
@@ -46,29 +44,27 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
         school.Zupanija.toLowerCase(),
         school.Trajanje.toString()
       ];
-      
+
       const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => term.length > 0);
-      const matchesSearch = searchTerms.length === 0 || 
-        searchTerms.every(term => 
+      const matchesSearch = searchTerms.length === 0 ||
+        searchTerms.every(term =>
           searchFields.some(field => field.includes(term))
         );
-      
-      const matchesZupanija = filters.zupanija === '' || 
+
+      const matchesZupanija = filters.zupanija === '' ||
         school.Zupanija === filters.zupanija;
-      
-      const matchesTrajanje = filters.trajanje === '' || 
+
+      const matchesTrajanje = filters.trajanje === '' ||
         school.Trajanje === Number(filters.trajanje);
 
       return matchesSearch && matchesZupanija && matchesTrajanje;
     });
   }, [schools, searchTerm, filters]);
 
-  // Reset to first page when filters change
   React.useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filters]);
 
-  // Pagination
   const totalPages = Math.ceil(filteredSchools.length / itemsPerPage);
   const paginatedSchools = filteredSchools.slice(
     (currentPage - 1) * itemsPerPage,
@@ -81,15 +77,14 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
     setCurrentPage(1);
   };
 
-  // Handle mobile filter close
   const handleMobileFilterClose = () => {
     setIsMobileFiltersOpen(false);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Search and Filter Controls */}
-      <motion.div 
+      <motion.div
         className="flex flex-col sm:flex-row gap-4 mb-6"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -104,12 +99,12 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
             placeholder="Pretraži po nazivu škole, programu, mjestu..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white placeholder-gray-400 text-sm outline-none transition-all duration-200 ease-in-out"
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white placeholder-gray-400 text-sm outline-none"
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white p-1 transition-colors duration-200"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white p-1"
             >
               <X className="h-4 w-4" />
             </button>
@@ -118,7 +113,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
 
         {/* Mobile Filters Button */}
         <motion.button
-          className="sm:hidden inline-flex items-center px-4 py-2.5 bg-gray-800 text-white rounded-lg border border-gray-700 transition-colors duration-200 hover:bg-gray-700"
+          className="sm:hidden inline-flex items-center px-4 py-2.5 bg-gray-800 text-white rounded-lg border border-gray-700"
           onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -130,13 +125,13 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
         {/* Mobile Filters Panel */}
         <AnimatePresence>
           {isMobileFiltersOpen && (
-            <motion.div 
+            <motion.div
               className="sm:hidden fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <motion.div 
+              <motion.div
                 className="fixed inset-y-0 right-0 w-full max-w-xs bg-gray-900 p-6 shadow-xl"
                 initial={{ x: "100%" }}
                 animate={{ x: 0 }}
@@ -147,7 +142,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
                   <h3 className="text-lg font-medium text-white">Filteri</h3>
                   <button
                     onClick={handleMobileFilterClose}
-                    className="text-gray-400 hover:text-white p-1 transition-colors duration-200"
+                    className="text-gray-400 hover:text-white p-1"
                   >
                     <X className="h-6 w-6" />
                   </button>
@@ -161,7 +156,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
                         setFilters(prev => ({ ...prev, zupanija: e.target.value }));
                         handleMobileFilterClose();
                       }}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 ease-in-out"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                     >
                       <option value="">Sve županije</option>
                       {zupanije.map(zupanija => (
@@ -177,7 +172,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
                         setFilters(prev => ({ ...prev, trajanje: e.target.value }));
                         handleMobileFilterClose();
                       }}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 ease-in-out"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                     >
                       <option value="">Sva trajanja</option>
                       {trajanja.map(trajanje => (
@@ -196,7 +191,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
           <select
             value={filters.zupanija}
             onChange={(e) => setFilters(prev => ({ ...prev, zupanija: e.target.value }))}
-            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[180px] transition-all duration-200 ease-in-out"
+            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[180px]"
           >
             <option value="">Sve županije</option>
             {zupanije.map(zupanija => (
@@ -207,7 +202,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
           <select
             value={filters.trajanje}
             onChange={(e) => setFilters(prev => ({ ...prev, trajanje: e.target.value }))}
-            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[140px] transition-all duration-200 ease-in-out"
+            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[140px]"
           >
             <option value="">Sva trajanja</option>
             {trajanja.map(trajanje => (
@@ -218,7 +213,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
           {(filters.zupanija || filters.trajanje || searchTerm) && (
             <motion.button
               onClick={resetFilters}
-              className="inline-flex items-center px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 border border-gray-700 transition-colors duration-200"
+              className="inline-flex items-center px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 border border-gray-700"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -230,7 +225,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
       </motion.div>
 
       {/* Results Info */}
-      <motion.div 
+      <motion.div
         className="text-gray-400 text-sm mb-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -253,7 +248,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
           </p>
           <motion.button
             onClick={resetFilters}
-            className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors duration-200"
+            className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -262,7 +257,7 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
         </motion.div>
       ) : (
         /* Table */
-        <motion.div 
+        <motion.div
           className="overflow-x-auto rounded-lg border border-gray-800"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -273,8 +268,8 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium">Program</th>
                 <th className="px-4 py-3 text-left text-sm font-medium">Škola</th>
-                <th className="px-4 py-3 text-left text-sm font-medium hidden sm:table-cell">Mjesto</th>
-                <th className="px-4 py-3 text-left text-sm font-medium hidden md:table-cell">Županija</th>
+                <th className="px-4 py-3 text-left text-sm font-medium">Mjesto</th>
+                <th className="px-4 py-3 text-left text-sm font-medium">Županija</th>
                 <th className="px-4 py-3 text-left text-sm font-medium">Trajanje</th>
               </tr>
             </thead>
@@ -289,8 +284,8 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
                 >
                   <td className="px-4 py-3 text-sm">{school.Program}</td>
                   <td className="px-4 py-3 text-sm">{school.Skola}</td>
-                  <td className="px-4 py-3 text-sm hidden sm:table-cell">{school.Mjesto}</td>
-                  <td className="px-4 py-3 text-sm hidden md:table-cell">{school.Zupanija}</td>
+                  <td className="px-4 py-3 text-sm">{school.Mjesto}</td>
+                  <td className="px-4 py-3 text-sm">{school.Zupanija}</td>
                   <td className="px-4 py-3 text-sm">{school.Trajanje}</td>
                 </motion.tr>
               ))}
@@ -312,4 +307,3 @@ const EnhancedSchoolTable: React.FC<SchoolTableProps> = ({ schools }) => {
 };
 
 export default EnhancedSchoolTable;
-
