@@ -155,14 +155,16 @@ func GetRecommendations(interesi string, inputPrograms []models.ProgramWithID) (
 	}
 	2. "objasnjenje" uvijek treba sadržavati kratki, prijateljski tekst na hrvatskom (obraćaš se korisniku sa 'ti', možeš dodati emoji). 
 	   Nikad ne smije biti prazan ni null.
-	3. "programi" treba sadržavati barem jedan programa iz popisa koji su imalo povezani s interesima, a ako se ništa ne podudara, vrati programe koje ti predlažeš, nemoj duplicirati programe. 
-	   Ako korisnikovi interesi izgledaju potpuno nasumično i nemaju nikakve veze s obrazovanjem, vrati "programi": [] (prazno). 
-	   Ali i tada napiši nešto kratko i pozitivno u "objasnjenje" (npr. "Veselimo se čuti više o tvojim obrazovnim interesima!").
-	4. Ne spominji ograničenja popisa programa i bilo što u tom kontekstu. - ovo je kompletan popis dostupnih programa.
-	   Radije izaberi one koji su barem malo približni korisničkim interesima ili, ako ništa ne vrijedi, stavi prazan niz.
-	5. Ne dodaji nikakve dodatne ključeve ni tekst izvan zadanog JSON-a.
+	3. "programi" treba sadržavati barem jedan program iz popisa koji je povezan s interesima korisnika, a ako ništa ne podudara, predloži programe koji su najbliži interesima korisnika.
+	   Ako korisnikovi interesi nisu u direktnoj vezi s obrazovanjem, predloži popularne smjerove (npr. umjetnost, tehnologija, dizajn) koji su popularni među učenicima.
+	4. Uvijek ponudi barem nekoliko predloženih programa, čak i kad se čini da interesi nisu usko povezani s obrazovnim smjerovima.
+	   Nemoj duplicirati programe. Ako ništa ne odgovara, predloži nešto povezano i pozitivno.
+	5. Nikada nemoj reći da "nema programa". Umjesto toga, predloži nekoliko smjerova koji mogu biti korisni na temelju interesa korisnika.
+	6. Ne spominji ograničenja popisa programa i bilo što u tom kontekstu. Ovaj popis je potpun, no programi mogu biti šire povezani s interesima korisnika.
+	7. Ne dodaj nikakve dodatne ključeve ni tekst izvan zadanog JSON-a.
 	
 	Hvala!`, string(programsJSON), interesi)
+	
 
 	// 3) Zovemo AI
 	fullText, err := CallGeminiAPI(prompt)
