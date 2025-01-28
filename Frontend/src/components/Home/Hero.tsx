@@ -4,6 +4,7 @@ import { GradientButton } from '../common/GradientButton';
 import { AnimatedBackground } from '../common/AnimatedBackground';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ScrollIndicator } from './ScrollIndicator';
 
 export const Hero = () => {
   const navigateTo = useNavigate();
@@ -63,7 +64,8 @@ export const Hero = () => {
           </div>
         </motion.div>
       </div>
+
+      <ScrollIndicator />
     </section>
   );
 };
-
