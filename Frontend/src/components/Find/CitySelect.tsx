@@ -61,12 +61,9 @@ export const CitySelect: React.FC<CitySelectProps> = ({
     };
 
     loadCities();
-  }, []); // Load cities only once on component mount
+  }, []);
 
-  // Filter cities by countyId if needed
   const filteredCities = React.useMemo(() => {
-    // If you need to filter by countyId, implement the logic here
-    // For now, return all cities since they're coming pre-filtered from the API
     return cities;
   }, [cities]);
 

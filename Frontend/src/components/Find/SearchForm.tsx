@@ -38,7 +38,7 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
 
   const handleClearCounty = () => {
     setSelectedCounty('');
-    setSelectedCity(''); // Clear city when county is cleared
+    setSelectedCity('');
   };
 
   const handleClearCity = () => {
