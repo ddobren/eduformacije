@@ -69,6 +69,7 @@ func GetSrednjeSkoleHandler(c *gin.Context) {
 
 	filterZupanija := c.Query("zupanija")
 	filterMjesto := c.Query("mjesto")
+	filterFounderType := c.Query("founderType")
 	filterImaDodatnuProvjeru := c.Query("imaDodatnuProvjeru")
 
 	var filterProvjeraPtr *bool
@@ -88,11 +89,15 @@ func GetSrednjeSkoleHandler(c *gin.Context) {
 	for _, s := range skole {
 		sZupanija := strings.TrimSpace(s.Zupanija)
 		sMjesto := strings.TrimSpace(s.Mjesto)
+		sFounderType := strings.TrimSpace(s.VrstaOsnivaca)
 
 		if filterZupanija != "" && !strings.EqualFold(sZupanija, filterZupanija) {
 			continue
 		}
 		if filterMjesto != "" && !strings.EqualFold(sMjesto, filterMjesto) {
+			continue
+		}
+		if filterFounderType != "" && !strings.EqualFold(sFounderType, filterFounderType) {
 			continue
 		}
 		if filterProvjeraPtr != nil {
@@ -172,6 +177,42 @@ func GetMjestaHandler(c *gin.Context) {
 	var result []string
 	for m := range distinctSet {
 		result = append(result, m)
+	}
+	sort.Strings(result)
+
+	c.JSON(http.StatusOK, result)
+}
+
+// GetVrsteOsnivacaHandler - GET /v1/srednje-skole/vrste-osnivaca
+func GetVrsteOsnivacaHandler(c *gin.Context) {
+	rdb := database.GetRedisClient()
+	data, err := rdb.Get(c.Request.Context(), "skole_json").Result()
+	if err != nil {
+		log.Printf("Greška prilikom čitanja iz Redisa: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "greška prilikom čitanja podataka iz Redisa",
+		})
+		return
+	}
+
+	var skole []models.Skola
+	if err := json.Unmarshal([]byte(data), &skole); err != nil {
+		log.Printf("Greška pri parsiranju JSON-a: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "greška pri parsiranju podataka",
+		})
+		return
+	}
+
+	distinctSet := make(map[string]bool)
+	for _, s := range skole {
+		v := strings.TrimSpace(s.VrstaOsnivaca)
+		distinctSet[v] = true
+	}
+
+	var result []string
+	for v := range distinctSet {
+		result = append(result, v)
 	}
 	sort.Strings(result)
 
