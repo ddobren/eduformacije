@@ -1,4 +1,3 @@
-import React from "react";
 import { Sparkles, TrendingUp, Lightbulb, Globe } from "lucide-react";
 import { FeatureCard } from "../Home/FeatureCard";
 
