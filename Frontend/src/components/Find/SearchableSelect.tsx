@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, X } from 'lucide-react';
 
 interface SearchableSelectProps {
   label: string;
@@ -7,6 +7,7 @@ interface SearchableSelectProps {
   onChange: (value: string) => void;
   options: string[];
   placeholder: string;
+  onClear?: () => void;
 }
 
 export const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -15,6 +16,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   onChange,
   options,
   placeholder,
+  onClear,
 }) => {
   const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -88,13 +90,26 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       )}
 
       {value && (
-        <div className="mt-2 px-3 py-1.5 bg-primary-500/10 text-primary-400 rounded-md 
-          inline-flex items-center gap-2 text-sm">
-          <MapPin className="w-4 h-4" />
-          <span className="truncate">{value}</span>
+        <div className="mt-2 inline-flex items-center gap-1.5">
+          <div className="px-3 py-1.5 bg-primary-500/10 text-primary-400 rounded-md 
+            inline-flex items-center gap-2 text-sm">
+            <MapPin className="w-4 h-4" />
+            <span className="truncate">{value}</span>
+          </div>
+          {onClear && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClear();
+              }}
+              className="p-1 hover:bg-gray-800/50 rounded-full transition-colors group"
+            >
+              <X className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+            </button>
+          )}
         </div>
       )}
     </div>
   );
 };
-

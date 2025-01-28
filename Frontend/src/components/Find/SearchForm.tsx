@@ -36,6 +36,15 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
     }
   };
 
+  const handleClearCounty = () => {
+    setSelectedCounty('');
+    setSelectedCity(''); // Clear city when county is cleared
+  };
+
+  const handleClearCity = () => {
+    setSelectedCity('');
+  };
+
   useEffect(() => {
     const adjustTextareaHeight = () => {
       if (textareaRef.current) {
@@ -197,10 +206,15 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
 
                 {isExpanded && (
                   <div className="space-y-4 bg-gray-800/30 p-4 rounded-lg animate-fadeIn">
-                    <CountySelect value={selectedCounty} onChange={setSelectedCounty} />
+                    <CountySelect 
+                      value={selectedCounty} 
+                      onChange={setSelectedCounty}
+                      onClear={handleClearCounty}
+                    />
                     <CitySelect 
                       value={selectedCity} 
                       onChange={setSelectedCity} 
+                      onClear={handleClearCity}
                       countyId={selectedCounty}
                     />
                     <EntranceExamSelect 
