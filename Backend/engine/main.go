@@ -125,6 +125,7 @@ func main() {
 		api.GET("/srednje-skole", handlers.GetSrednjeSkoleHandler) // Redis
 		api.GET("/srednje-skole/zupanije", handlers.GetZupanijeHandler)
 		api.GET("/srednje-skole/mjesta", handlers.GetMjestaHandler)
+		api.GET("/srednje-skole/vrste-osnivaca", handlers.GetVrsteOsnivacaHandler)
 
 		api.GET("/skole/srednje", handlers.GetSrednjeHandler) // MongoDB
 		api.GET("/skole/osnovne", handlers.GetOsnovneHandler) // MongoDB
