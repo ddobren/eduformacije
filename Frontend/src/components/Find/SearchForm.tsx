@@ -1,30 +1,37 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, Sparkles, AlertCircle, FilterIcon } from 'lucide-react';
-import { CountySelect } from './CountySelect';
-import { CitySelect } from './CitySelect';
-import { EntranceExamSelect } from './EntranceExamSelect';
-import { GradientButton } from '../common/GradientButton';
-import { toast } from '../../utils/toast';
+import React, { useState, useRef, useEffect } from "react";
+import { Search, Sparkles, AlertCircle, FilterIcon } from "lucide-react";
+import { CountySelect } from "./CountySelect";
+import { CitySelect } from "./CitySelect";
+import { EntranceExamSelect } from "./EntranceExamSelect";
+import { FounderTypeSelect } from "./FounderTypeSelect";
+import { GradientButton } from "../common/GradientButton";
+import { toast } from "../../utils/toast";
 
 const MAX_CHARS = 200;
+const token =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.4rz5eH4rojtUQSPI8CcroOf4CRJjo6N9_HQAI_9e1t0";
 
 interface SearchFormProps {
   onSearchStart: () => void;
   onSearchComplete: (
-    results: { 
-      objasnjenje: string; 
-      programi: { 
-        skolaProgramRokId: string; 
-        program: string 
-      }[] 
+    results: {
+      objasnjenje: string;
+      programi: {
+        skolaProgramRokId: string;
+        program: string;
+      }[];
     } | null
   ) => void;
 }
 
-export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps) => {
-  const [interests, setInterests] = useState('');
-  const [selectedCounty, setSelectedCounty] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
+export const SearchForm = ({
+  onSearchStart,
+  onSearchComplete,
+}: SearchFormProps) => {
+  const [interests, setInterests] = useState("");
+  const [selectedCounty, setSelectedCounty] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedFounderType, setSelectedFounderType] = useState("");
   const [hasEntranceExam, setHasEntranceExam] = useState<boolean | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -37,27 +44,31 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
   };
 
   const handleClearCounty = () => {
-    setSelectedCounty('');
-    setSelectedCity('');
+    setSelectedCounty("");
+    setSelectedCity("");
   };
 
   const handleClearCity = () => {
-    setSelectedCity('');
+    setSelectedCity("");
+  };
+
+  const handleClearFounderType = () => {
+    setSelectedFounderType("");
   };
 
   useEffect(() => {
     const adjustTextareaHeight = () => {
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = "auto";
         textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
       }
     };
 
     adjustTextareaHeight();
-    window.addEventListener('resize', adjustTextareaHeight);
+    window.addEventListener("resize", adjustTextareaHeight);
 
     return () => {
-      window.removeEventListener('resize', adjustTextareaHeight);
+      window.removeEventListener("resize", adjustTextareaHeight);
     };
   }, [interests]);
 
@@ -67,72 +78,80 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (interests === '') {
-      toast.warning('Molimo unesite svoje interese i želje.');
+    if (interests === "") {
+      toast.warning("Molimo unesite svoje interese i želje.");
       return;
     }
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.4rz5eH4rojtUQSPI8CcroOf4CRJjo6N9_HQAI_9e1t0";
-
     const params = new URLSearchParams();
-    if (selectedCounty) params.append('zupanija', selectedCounty);
-    if (selectedCity) params.append('mjesto', selectedCity);
-    if (hasEntranceExam !== null) params.append('imaDodatnuProvjeru', String(hasEntranceExam));
+    if (selectedCounty) params.append("zupanija", selectedCounty);
+    if (selectedCity) params.append("mjesto", selectedCity);
+    if (selectedFounderType)
+      params.append("founderType", selectedFounderType);
+    if (hasEntranceExam !== null)
+      params.append("imaDodatnuProvjeru", String(hasEntranceExam));
 
     onSearchStart();
 
     try {
       const endpoint = `https://engine.eduformacije.com/api/v1/srednje-skole?${params.toString()}`;
       const response = await fetch(endpoint, {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
-        throw new Error('Greška prilikom dohvaćanja podataka.');
+        throw new Error("Greška prilikom dohvaćanja podataka.");
       }
 
       const data = await response.json();
-      const programs = data && data.length > 0
-        ? data.map((item: { Program: string; SkolaProgramRokId: number }) => ({
-            skolaProgramRokId: String(item.SkolaProgramRokId),
-            program: item.Program,
-          }))
-        : [];
+      const programs =
+        data && data.length > 0
+          ? data.map(
+              (item: { Program: string; SkolaProgramRokId: number }) => ({
+                skolaProgramRokId: String(item.SkolaProgramRokId),
+                program: item.Program,
+              })
+            )
+          : [];
 
       const jsonBody = {
         interesi: interests,
         programi: programs,
       };
 
-      const suggestionsResponse = await fetch('https://engine.eduformacije.com/api/v1/srednje-skole/sugestije', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(jsonBody),
-      });
+      const suggestionsResponse = await fetch(
+        "https://engine.eduformacije.com/api/v1/srednje-skole/sugestije",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(jsonBody),
+        }
+      );
 
       if (!suggestionsResponse.ok) {
-        throw new Error('Greška prilikom dohvaćanja sugestija.');
+        throw new Error("Greška prilikom dohvaćanja sugestija.");
       }
 
       const suggestions = await suggestionsResponse.json();
       onSearchComplete(suggestions);
       console.log(suggestions);
-
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Došlo je do greške.');
+      toast.error(
+        error instanceof Error ? error.message : "Došlo je do greške."
+      );
       onSearchComplete(null);
     }
   };
 
   return (
-    <div className="w-full overflow-x-hidden"> 
+    <div className="w-full overflow-x-hidden">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <form onSubmit={handleSubmit} className="relative">
           <div className="bg-gradient-to-b from-gray-900/80 to-gray-900/95 backdrop-blur-xl rounded-2xl border border-gray-800/50 shadow-2xl">
@@ -141,10 +160,14 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20">
                   <Sparkles className="w-3.5 h-3.5 text-primary-400" />
-                  <span className="text-xs font-medium text-primary-400">AI asistent</span>
+                  <span className="text-xs font-medium text-primary-400">
+                    AI asistent
+                  </span>
                 </div>
-                <span 
-                  className={`text-xs ${isNearLimit ? 'text-orange-400' : 'text-gray-400'}`}
+                <span
+                  className={`text-xs ${
+                    isNearLimit ? "text-orange-400" : "text-gray-400"
+                  }`}
                 >
                   {charsRemaining} znakova
                 </span>
@@ -169,7 +192,7 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
                     focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 resize-none
                     text-white placeholder-gray-500 text-sm md:text-base transition-all outline-none overflow-hidden
                     md:leading-6"
-                    style={{ fontSize: '16px' }} 
+                    style={{ fontSize: "16px" }}
                     placeholder="Npr: Zanima me fitness i zdrav način života. Volio/la bih postati personalni trener..."
                   />
                   {isNearLimit && (
@@ -179,7 +202,8 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
                   )}
                 </div>
                 <p className="text-xs text-gray-400 leading-relaxed">
-                  Što više detalja pružiš o svojim interesima i hobijima, to ćemo ti preciznije pomoći pronaći idealnu školu.
+                  Što više detalja pružiš o svojim interesima i hobijima, to
+                  ćemo ti preciznije pomoći pronaći idealnu školu.
                 </p>
               </div>
 
@@ -192,33 +216,47 @@ export const SearchForm = ({ onSearchStart, onSearchComplete }: SearchFormProps)
                 >
                   <div className="flex items-center gap-2">
                     <FilterIcon className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-medium text-white/90">Dodatni filtri</span>
+                    <span className="text-sm font-medium text-white/90">
+                      Dodatni filtri
+                    </span>
                   </div>
                   <svg
-                    className={`w-5 h-5 text-white transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    className={`w-5 h-5 text-white transition-transform ${
+                      isExpanded ? "rotate-180" : ""
+                    }`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
 
                 {isExpanded && (
                   <div className="space-y-4 bg-gray-800/30 p-4 rounded-lg animate-fadeIn">
-                    <CountySelect 
-                      value={selectedCounty} 
+                    <CountySelect
+                      value={selectedCounty}
                       onChange={setSelectedCounty}
                       onClear={handleClearCounty}
                     />
-                    <CitySelect 
-                      value={selectedCity} 
-                      onChange={setSelectedCity} 
+                    <CitySelect
+                      value={selectedCity}
+                      onChange={setSelectedCity}
                       onClear={handleClearCity}
                       countyId={selectedCounty}
                     />
-                    <EntranceExamSelect 
-                      value={hasEntranceExam} 
+                    <FounderTypeSelect
+                      value={selectedFounderType}
+                      onChange={setSelectedFounderType}
+                      onClear={handleClearFounderType}
+                    />
+                    <EntranceExamSelect
+                      value={hasEntranceExam}
                       onChange={setHasEntranceExam}
                     />
                   </div>
