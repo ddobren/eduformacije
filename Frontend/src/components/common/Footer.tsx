@@ -14,9 +14,6 @@ export const Footer = () => {
                 Edu<span className="text-primary-400">formacije</span>
               </span>
             </div>
-            <p className="text-sm leading-relaxed">
-              Pronađi svoju idealnu školu uz pomoć napredne AI tehnologije
-            </p>
           </div>
 
           <div>
