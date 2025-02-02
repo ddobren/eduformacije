@@ -169,11 +169,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
           Edu<span className="text-primary-400">formacije</span>
         </motion.h1>
         <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto text-center">
-          Pretražite sve škole u{" "}
-          <span className="bg-gradient-to-r from-red-500 via-white to-blue-500 bg-clip-text text-transparent font-bold">
-            Hrvatskoj
-          </span>{" "}
-          na jednom mjestu.
+          Pretražite sve škole u Hrvatskoj na jednom mjestu
         </p>
       </div>
 

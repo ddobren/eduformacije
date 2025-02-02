@@ -14,13 +14,13 @@ export const Hero = () => {
       <AnimatedBackground />
 
       <div className="relative w-full max-w-7xl mx-auto flex flex-col justify-center items-center space-y-10 sm:space-y-12 py-16 sm:py-20 lg:py-24">
-        <motion.div 
+        <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <motion.div 
+          <motion.div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 mb-8 sm:mb-10 hover:bg-primary-500/15 transition-all duration-300"
             whileHover={{ scale: 1.05 }}
           >
@@ -28,10 +28,7 @@ export const Hero = () => {
           </motion.div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 sm:mb-8 tracking-tight leading-tight">
-            <span className="bg-gradient-to-r from-red-600 via-white to-blue-600 bg-clip-text text-transparent animate-gradient-flow">
-              Pronađi
-            </span>{' '}
-            svoju idealnu{' '}
+            Pronađi svoju idealnu{' '}
             <span className="relative inline-block">
               <span className="bg-gradient-to-r from-primary-400 via-primary-500 to-primary-400 bg-clip-text text-transparent">
                 školu
@@ -46,7 +43,7 @@ export const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
-            <NormalButton 
+            <NormalButton
               onClick={() => navigateTo('/search')}
               className="w-full sm:w-auto text-base sm:text-lg py-3 px-6 sm:py-4 sm:px-8"
             >
@@ -54,7 +51,7 @@ export const Hero = () => {
               Istraži sve škole
             </NormalButton>
 
-            <GradientButton 
+            <GradientButton
               onClick={() => navigateTo('/find')}
               className="w-full sm:w-auto text-base sm:text-lg py-3 px-6 sm:py-4 sm:px-8"
             >
