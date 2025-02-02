@@ -45,7 +45,6 @@ export const ScrollIndicator = () => {
                     }}
                     className="flex flex-col items-center gap-2"
                 >
-                    <span className="text-gray-400 text-sm font-medium hidden sm:block">Scroll za više</span>
                     <ChevronDown className="w-6 h-6 text-primary-400" />
                 </motion.div>
             </motion.div>
