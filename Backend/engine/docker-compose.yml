@@ -27,7 +27,7 @@ services:
       - traefik-certificates:/letsencrypt
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(dashboard.eduformacije.com)"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard.eduformacije.com`)"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
       - "traefik.http.routers.dashboard.service=api@internal"
@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.engine.rule=Host(engine.eduformacije.com)"
+      - "traefik.http.routers.engine.rule=Host(`engine.eduformacije.com`)"
       - "traefik.http.routers.engine.entrypoints=websecure"
       - "traefik.http.routers.engine.tls.certresolver=myresolver"
       - "traefik.http.services.engine.loadbalancer.server.port=80"
