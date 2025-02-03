@@ -7,7 +7,7 @@ export const AboutContent = () => {
       icon: TrendingUp,
       title: "Naša misija",
       description:
-        "Naša misija je da učenicima i roditeljima omogućimo pristup detaljnim informacijama o školama na intuitivan i jednostavan način, s naglaskom na AI preporuke.",
+        "Naša misija je učenicima i roditeljima omogućiti pristup detaljnim informacijama o školama na intuitivan i jednostavan način, s naglaskom na AI preporuke.",
     },
     {
       icon: Lightbulb,
