@@ -59,7 +59,7 @@ export const ContactContent = () => {
           <span className="text-base text-primary-400 font-medium">Kontakt</span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6 sm:mb-8 tracking-tight leading-tight">
-          Stupite u kontakt
+          Kontakt
         </h1>
         <p className="text-base sm:text-lg lg:text-xl text-gray-400 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed">
           Ako imate pitanja, trebate dodatne informacije ili želite surađivati,
