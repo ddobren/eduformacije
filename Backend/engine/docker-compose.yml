@@ -12,7 +12,7 @@ services:
       - "--entrypoints.dashboard.address=:8080"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=dragojevicdobren@gmail.com" 
+      - "--certificatesresolvers.myresolver.acme.email=dragojevicdobren@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--log.level=INFO"
@@ -35,6 +35,21 @@ services:
     networks:
       - default
 
+  cdn:
+    image: nginx:latest
+    restart: unless-stopped
+    volumes:
+      - ./static:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cdn.rule=Host(`cdn.eduformacije.com`)"
+      - "traefik.http.routers.cdn.entrypoints=websecure"
+      - "traefik.http.routers.cdn.tls.certresolver=myresolver"
+      - "traefik.http.services.cdn.loadbalancer.server.port=80"
+    networks:
+      - default
+
   engine:
     build: .
     restart: unless-stopped
@@ -52,6 +67,7 @@ services:
     depends_on:
       - mongo
       - redis
+      - cdn  # Pokreće se tek nakon što se CDN digne
 
   mongo:
     image: mongo
@@ -59,8 +75,8 @@ services:
     volumes:
       - mongo_data:/data/db
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=adminUser123 # Promjeniti korisnika na VPS-u
-      - MONGO_INITDB_ROOT_PASSWORD=jakaSifra123 # Promjeniti sifru na VPS-u
+      - MONGO_INITDB_ROOT_USERNAME=adminUser123 # Promjeni korisnika na VPS-u
+      - MONGO_INITDB_ROOT_PASSWORD=jakaSifra123 # Promjeni šifru na VPS-u
     labels:
       - "traefik.enable=false"
     networks:
