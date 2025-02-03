@@ -126,6 +126,7 @@ export const Navbar = () => {
 
   const navLinks = [
     { path: "/", label: "Početna" },
+    { path: "/news", label: "Novosti" },
     { path: "/about", label: "O nama" },
     { path: "/contact", label: "Kontakt" },
     { path: "/faq", label: "FAQ" },

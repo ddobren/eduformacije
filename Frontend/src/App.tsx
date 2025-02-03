@@ -11,6 +11,7 @@ import { Search } from './pages/Search';
 import FAQ from './pages/FAQ';
 import Privacy from './pages/Privacy';
 import { SrednjeSkole } from './pages/SrednjeSkole';
+import Novosti from './pages/Novosti';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -42,6 +43,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/news" element={<Novosti />} />
             <Route path="/find" element={<Find />} />
             <Route path="/search" element={<Search />} />
             <Route path="/about" element={<About />} />
