@@ -133,6 +133,9 @@ func main() {
 		api.GET("/status", handlers.GetStatusHandler)
 	}
 
+	// Static files
+	r.GET("/USS/GetSkole", handlers.ServeStaticSkoleHandler)
+
 	// favicon.ico handler, ignoriranje
 	r.GET("/favicon.ico", func(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNoContent)
