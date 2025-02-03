@@ -59,7 +59,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         }
 
         const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.4rz5eH4rojtUQSPI8CcroOf4CRJjo6N9_HQAI_9e1t0";
-
         const [responseOsnovne, responseSrednje] = await Promise.all([
           fetch("https://engine.eduformacije.com/api/v1/skole/osnovne", {
             headers: {
@@ -94,8 +93,8 @@ export const SearchForm: React.FC<SearchFormProps> = ({
 
     const initializeFuse = (schools: School[]) => {
       fuse.current = new Fuse(schools, {
-        keys: ["Naziv", "Mjesto"],
-        threshold: 0.4,
+        keys: ["Naziv", "Mjesto"], 
+        threshold: 0.4,            
       });
     };
 
@@ -258,19 +257,16 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                                    sm:gap-4 text-gray-300 hover:text-white 
                                    transition-colors active:bg-gray-800/50"
                         onClick={() => {
-                          // 1. Postavi tekst u input
                           setSearchTerm(suggestion.Naziv);
-                          // 2. Zatvori dropdown
                           setShowSuggestions(false);
-                          // 3. Očisti listu sugestija
                           setSuggestions([]);
-                          // 4. (Neobavezno) vrati fokus, ili makni fokus na mobitelu
                           if (inputRef.current) {
                             inputRef.current.focus();
                             if (isMobile) {
                               inputRef.current.blur();
                             }
                           }
+                          onSearchComplete([suggestion]);
                         }}
                       >
                         <div className="min-w-0 flex-1">
