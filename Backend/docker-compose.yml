@@ -7,11 +7,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      # Glavni Caddyfile iz foldera "caddy"
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      # Statičke datoteke (npr. srednje-programi.json) iz foldera "cdn"
       - ./cdn:/srv/cdn:ro
-      # Volumeni za Caddy cert i config (LE, itd.)
       - caddy_data:/data
       - caddy_config:/config
     networks:
@@ -23,11 +20,9 @@ services:
     build: ./engine
     container_name: engine
     restart: unless-stopped
-    # Uzimamo varijable iz .env (u root-u projekta)
     env_file:
       - .env
     environment:
-      # Primjer - ako želite prebrisati ili dodati varijable
       - REDIS_ADDR=redis:6379
       - REDIS_PASSWORD=StrongRedisPassword123
     networks:
