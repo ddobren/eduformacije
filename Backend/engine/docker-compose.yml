@@ -22,6 +22,9 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=StrongRedisPassword123
     networks:
       - default
     depends_on:
@@ -29,12 +32,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-        reservations:
-          memory: 512M
 
   mongo:
     image: mongo
@@ -58,17 +55,11 @@ services:
     volumes:
       - redis_data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes
-    sysctls:
-      net.core.somaxconn: "65535"
+    command: redis-server /usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_PASSWORD=StrongRedisPassword123
     networks:
       - default
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-        reservations:
-          memory: 512M
     healthcheck:
       test: [ "CMD", "redis-cli", "-a", "StrongRedisPassword123", "ping" ]
       interval: 5s
