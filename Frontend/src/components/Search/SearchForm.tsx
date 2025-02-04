@@ -1,6 +1,6 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import { Search, SchoolIcon, MapPin } from "lucide-react"
+import { Search, SchoolIcon, MapPin, X } from "lucide-react"  // Uvezen je i X za "clear" gumb
 import { toast } from "../../utils/toast"
 import type { School } from "../../types/search"
 import Fuse from "fuse.js"
@@ -77,7 +77,10 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearchStart, onSearchC
           throw new Error("Greška prilikom dohvaćanja škola.")
         }
 
-        const [osnovneSkole, srednjeSkole] = await Promise.all([responseOsnovne.json(), responseSrednje.json()])
+        const [osnovneSkole, srednjeSkole] = await Promise.all([
+          responseOsnovne.json(),
+          responseSrednje.json(),
+        ])
 
         const combinedData: School[] = [...osnovneSkole, ...srednjeSkole]
         localStorage.setItem("allSchools", JSON.stringify(combinedData))
@@ -175,6 +178,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearchStart, onSearchC
             <div className="absolute inset-0 bg-gradient-to-r from-primary-400/20 via-primary-500/20 to-primary-600/20 rounded-2xl blur-xl opacity-75" />
             <div className="relative bg-gray-900/90 backdrop-blur-sm rounded-2xl border border-gray-800/50 shadow-2xl">
               <div className="flex items-center p-2">
+                {/* Input container – pozicija je relative kako bi se clear gumb mogao apsolutno pozicionirati */}
                 <div className="relative flex-1">
                   <input
                     ref={inputRef}
@@ -187,13 +191,23 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearchStart, onSearchC
                     autoComplete="off"
                     spellCheck={false}
                   />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                      aria-label="Očisti unos"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  )}
                 </div>
                 <button
                   type="submit"
-                  className={`ml-2 px-4 sm:px-6 py-3 sm:py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-xl flex items-center gap-2 transition-colors duration-200 ${isMobile ? "flex-shrink-0" : ""}`}
+                  className="ml-2 px-4 sm:px-6 py-3 sm:py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-xl flex items-center gap-2 transition-colors duration-200"
                 >
                   <Search className="w-5 h-5" />
-                  <span className={isMobile ? "sr-only" : "inline font-medium"}>Pretraži</span>
+                  <span className="hidden sm:inline font-medium">Pretraži</span>
                 </button>
               </div>
 
@@ -205,9 +219,10 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearchStart, onSearchC
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className={`border-t border-gray-800 ${isMobile ? "fixed inset-x-4 top-1/2 transform -translate-y-1/2" : "relative"}`}
+                    // Sada je dropdown uvijek apsolutno pozicioniran ispod inputa
+                    className="absolute z-10 left-0 right-0 mt-2 border border-gray-800 bg-gray-900 rounded-lg shadow-lg"
                     style={{
-                      maxHeight: isMobile ? "60vh" : "400px",
+                      maxHeight: isMobile ? "50vh" : "400px",
                       overflowY: "auto",
                     }}
                   >
@@ -256,4 +271,3 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearchStart, onSearchC
     </div>
   )
 }
-
