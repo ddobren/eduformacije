@@ -1,73 +1,41 @@
+version: '3.8'
+
 services:
-  traefik:
-    image: traefik:v2.10
+  caddy:
+    image: caddy:latest
     restart: unless-stopped
-    command:
-      - "--api.dashboard=true"
-      - "--api.insecure=false"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.dashboard.address=:8080"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=dragojevicdobren@gmail.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--log.level=INFO"
-      - "--accesslog=true"
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - traefik-certificates:/letsencrypt
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.middlewares.blockip.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
-      - "traefik.http.middlewares.blockip.headers.customresponseheaders.X-Content-Type-Options=nosniff"
-      - "traefik.http.middlewares.blockip.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
-      - "traefik.http.routers.dashboard.rule=Host(`dashboard.eduformacije.com`)"
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
-      - "traefik.http.routers.dashboard.service=api@internal"
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
     networks:
       - default
+    depends_on:
+      - cdn
+      - engine
 
   cdn:
-    image: nginx:latest
+    image: caddy:latest
     restart: unless-stopped
     volumes:
-      - ./static:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.cdn.rule=Host(`cdn.eduformacije.com`)"
-      - "traefik.http.routers.cdn.entrypoints=websecure"
-      - "traefik.http.routers.cdn.tls.certresolver=myresolver"
-      - "traefik.http.services.cdn.loadbalancer.server.port=80"
+      - ./static:/srv:ro  # CDN sada služi sve datoteke iz 'static' direktorija
     networks:
       - default
 
   engine:
     build: .
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.engine.rule=Host(`engine.eduformacije.com`)"
-      - "traefik.http.routers.engine.entrypoints=websecure"
-      - "traefik.http.routers.engine.tls.certresolver=myresolver"
-      - "traefik.http.services.engine.loadbalancer.server.port=80"
-      - "traefik.http.routers.engine.middlewares=blockip"
-    networks:
-      - default
     env_file:
       - .env
+    networks:
+      - default
     depends_on:
       - mongo
       - redis
-      - cdn  # Pokreće se tek nakon što se CDN digne
+      - cdn  # Engine se pokreće tek nakon CDNa
 
   mongo:
     image: mongo
@@ -77,8 +45,6 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=adminUser123 # Promjeni korisnika na VPS-u
       - MONGO_INITDB_ROOT_PASSWORD=jakaSifra123 # Promjeni šifru na VPS-u
-    labels:
-      - "traefik.enable=false"
     networks:
       - default
 
@@ -104,13 +70,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    labels:
-      - "traefik.enable=false"
 
 volumes:
   mongo_data:
   redis_data:
-  traefik-certificates:
+  caddy_data:
+  caddy_config:
 
 networks:
   default:

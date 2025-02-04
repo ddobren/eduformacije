@@ -1,0 +1,8 @@
+engine.eduformacije.com {
+    reverse_proxy engine:80
+}
+
+cdn.eduformacije.com {
+    root * /srv
+    file_server
+}
