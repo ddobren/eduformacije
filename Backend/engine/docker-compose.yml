@@ -15,8 +15,7 @@ services:
     networks:
       - default
     depends_on:
-      engine:
-        condition: service_healthy
+      - engine
 
   engine:
     build: .
@@ -30,11 +29,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "https://engine.eduformacije.com/api/v1/status" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   mongo:
     image: mongo
