@@ -5,51 +5,65 @@
 >
   <!-- Početna stranica -->
   <url>
-    <loc>https://beta.eduformacije.com/</loc>
+    <loc>https://eduformacije.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+
+  <!-- /news -->
+  <url>
+    <loc>https://eduformacije.com/news</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
   
   <!-- /find -->
   <url>
-    <loc>https://beta.eduformacije.com/find</loc>
+    <loc>https://eduformacije.com/find</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- /search -->
   <url>
-    <loc>https://beta.eduformacije.com/search</loc>
+    <loc>https://eduformacije.com/search</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- /about -->
   <url>
-    <loc>https://beta.eduformacije.com/about</loc>
+    <loc>https://eduformacije.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <!-- /contact -->
   <url>
-    <loc>https://beta.eduformacije.com/contact</loc>
+    <loc>https://eduformacije.com/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <!-- /faq -->
   <url>
-    <loc>https://beta.eduformacije.com/faq</loc>
+    <loc>https://eduformacije.com/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <!-- /privacy -->
   <url>
-    <loc>https://beta.eduformacije.com/privacy</loc>
+    <loc>https://eduformacije.com/privacy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+  </url>
+
+  <!-- /srednje-skole -->
+  <url>
+    <loc>https://eduformacije.com/srednje-skole</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
   
 </urlset>
