@@ -15,8 +15,8 @@ services:
     networks:
       - default
     depends_on:
-      - engine
-      # Više nema cdn-a
+      engine:
+        condition: service_healthy
 
   engine:
     build: .
@@ -26,9 +26,10 @@ services:
     networks:
       - default
     depends_on:
-      - mongo
-      - redis
-      # maknuli smo cdn
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   mongo:
     image: mongo
@@ -40,6 +41,11 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=jakaSifra123
     networks:
       - default
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:6.2.6
@@ -55,11 +61,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 512M
         reservations:
-          memory: 128M
+          memory: 256M
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: [ "CMD", "redis-cli", "-a", "StrongRedisPassword123", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
