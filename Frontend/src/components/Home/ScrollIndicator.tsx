@@ -1,53 +1,48 @@
-import { ChevronDown } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { ChevronDown } from "lucide-react"
+import { motion, useScroll, useMotionValueEvent } from "framer-motion"
+import { useState } from "react"
 
 export const ScrollIndicator = () => {
-    const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(true)
+  const { scrollY } = useScroll()
 
-    const scrollToFeatures = () => {
-        const featuresSection = document.querySelector('#features');
-        featuresSection?.scrollIntoView({ behavior: 'smooth' });
-    };
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsVisible(latest <= 50)
+  })
 
-    const handleScroll = () => {
-        if (window.scrollY > 50) {
-            setIsVisible(false);
-        } else {
-            setIsVisible(true);
-        }
-    };
+  const scrollToFeatures = () => {
+    const featuresSection = document.querySelector("#features")
+    featuresSection?.scrollIntoView({ behavior: "smooth" })
+  }
 
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
+  return (
+    <motion.div
+      className="absolute bottom-8 left-0 w-full flex justify-center"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+      transition={{ duration: 0.3 }}
+    >
+      <motion.div
+        className="cursor-pointer"
+        onClick={scrollToFeatures}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <motion.div
+          animate={{
+            y: [0, 8, 0],
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: Number.POSITIVE_INFINITY,
+            ease: "easeInOut",
+          }}
+          className="flex flex-col items-center gap-2"
+        >
+          <ChevronDown className="w-8 h-8 text-primary" />
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  )
+}
 
-    return (
-        <div className={`absolute bottom-0 left-0 w-full flex justify-center pb-8 ${isVisible ? 'block' : 'hidden'}`}>
-            <motion.div
-                className="cursor-pointer"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1, duration: 0.5 }}
-                onClick={scrollToFeatures}
-            >
-                <motion.div
-                    animate={{
-                        y: [0, 8, 0],
-                    }}
-                    transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                    className="flex flex-col items-center gap-2"
-                >
-                    <ChevronDown className="w-6 h-6 text-primary-400" />
-                </motion.div>
-            </motion.div>
-        </div>
-    );
-};
