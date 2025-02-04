@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -19,33 +20,23 @@ import (
 var logger = logrus.New()
 
 func init() {
-	// Konfiguracija loggera za upotrebu lumberjack
 	logger.SetOutput(&lumberjack.Logger{
-		Filename:   "./server.log", // putanja do log datoteke
-		MaxSize:    1024,           // maksimalna veličina u megabajtima (1GB)
-		MaxBackups: 3,              // maksimalan broj backup datoteka
-		MaxAge:     28,             // maksimalan broj dana za zadržavanje backup datoteka
-		Compress:   true,           // da li da komprimira backup datoteke
+		Filename:   "./server.log",
+		MaxSize:    1024,
+		MaxBackups: 3,
+		MaxAge:     28,
+		Compress:   true,
 	})
-	// Postavljanje formata logiranja na JSON
 	logger.SetFormatter(&logrus.JSONFormatter{})
 }
 
-// Logiranje vremena trajanja zahtjeva s detaljima
 func logRequestDetails(c *gin.Context) {
 	start := time.Now()
-
-	// Ispisujemo IP adresu korisnika
 	clientIP := c.ClientIP()
-
-	// Proslijedi zahtjev
 	c.Next()
-
-	// Izračunaj vrijeme trajanja
 	duration := time.Since(start)
 	statusCode := c.Writer.Status()
 
-	// Logiranje u JSON formatu za bolje praćenje
 	logger.WithFields(logrus.Fields{
 		"client_ip":   clientIP,
 		"method":      c.Request.Method,
@@ -56,14 +47,12 @@ func logRequestDetails(c *gin.Context) {
 	}).Info("Request processed")
 }
 
-// Logiranje grešaka
 func logError(err error) {
 	logger.WithFields(logrus.Fields{
 		"error": err.Error(),
 	}).Error("An error occurred")
 }
 
-// Periodično ažuriranje podataka svakih 24 sata
 func startPolling(interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	for {
@@ -75,77 +64,80 @@ func startPolling(interval time.Duration) {
 }
 
 func main() {
-	// Učitaj konfiguraciju
 	config.InitConfig()
 
-	// Inicijalizacija Redis klijenta
 	database.InitRedis()
 	rdb := database.GetRedisClient()
-	services.UpdateSkoleData()
 
-	// Inicijalizacija MongoDB
+	// Dodaj channel za sinkronizaciju
+	redisDone := make(chan bool)
+
+	// Pokreni UpdateSkoleData u goroutine
+	go func() {
+		if err := services.UpdateSkoleData(); err != nil {
+			log.Printf("❌ Greška pri ažuriranju škola u Redis: %v", err)
+		}
+		redisDone <- true
+	}()
+
+	// Čekaj da se Redis operacija završi
+	select {
+	case <-redisDone:
+		log.Println("✅ Redis ažuriranje završeno")
+	case <-time.After(30 * time.Second):
+		log.Println("⚠️ Timeout pri ažuriranju Redis podataka")
+	}
+
 	database.InitMongo()
 	services.UpdateSrednjeSkole()
 	services.UpdateOsnovneSkole()
 
-	// Postavljanje Gin mode iz environment varijable
-	ginMode := config.GetEnv("GIN_MODE", "debug") // Default na "debug" ako nije postavljeno
-	gin.SetMode(ginMode)                          // Postavljamo Gin mode za debug ili release
+	ginMode := config.GetEnv("GIN_MODE", "debug")
+	gin.SetMode(ginMode)
 
-	// Kreiramo Gin router
 	r := gin.Default()
-
-	// Dodajemo vlastiti middleware za logiranje vremena trajanja zahtjeva
 	r.Use(logRequestDetails)
 
-	// Dohvati trusted proxy IP adrese iz environment varijable
 	trustedProxies := config.GetEnv("GIN_TRUSTED_PROXIES", "127.0.0.1")
 	proxies := strings.Split(trustedProxies, ",")
 	r.SetTrustedProxies(proxies)
 
-	// Dodaj CORS middleware
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},                                       // Dozvoljene domene
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Dozvoljene HTTP metode
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // Dozvoljeni zaglavlja
-		ExposeHeaders:    []string{"Content-Length"},                          // Zaglavlja koja se izlažu
-		AllowCredentials: true,                                                // Omogućavanje kolačića
-		MaxAge:           12 * time.Hour,                                      // Cache za preflight zahtjeve
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
 	}))
 
-	// Primjena rate limiting middleware-a (10 zahtjeva u 1 sekundi)
 	r.Use(handlers.CustomRateLimiter(rdb, 10, time.Second))
 	r.Use(gin.Logger())
-	r.Use(gin.Recovery()) // Recovery middleware za panic handling
+	r.Use(gin.Recovery())
 
-	// JWT middleware za osiguranje API-ja
 	api := r.Group("/api/v1", handlers.JWTAuthMiddleware())
 	{
 		api.POST("/srednje-skole/sugestije", handlers.PostSugestijeHandler)
-		api.GET("/srednje-skole", handlers.GetSrednjeSkoleHandler) // Redis
+		api.GET("/srednje-skole", handlers.GetSrednjeSkoleHandler)
 		api.GET("/srednje-skole/zupanije", handlers.GetZupanijeHandler)
 		api.GET("/srednje-skole/mjesta", handlers.GetMjestaHandler)
 		api.GET("/srednje-skole/vrste-osnivaca", handlers.GetVrsteOsnivacaHandler)
 
-		api.GET("/skole/srednje", handlers.GetSrednjeHandler) // MongoDB
-		api.GET("/skole/osnovne", handlers.GetOsnovneHandler) // MongoDB
+		api.GET("/skole/srednje", handlers.GetSrednjeHandler)
+		api.GET("/skole/osnovne", handlers.GetOsnovneHandler)
 
 		api.GET("/status", handlers.GetStatusHandler)
 	}
 
-	// favicon.ico handler, ignoriranje
 	r.GET("/favicon.ico", func(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNoContent)
 	})
 
-	// Periodično ažuriranje podataka svakih 24 sata
 	go startPolling(24 * time.Hour)
 
-	// Dohvati port iz environment varijable, default je 8080
 	port := config.GetEnv("PORT", "8080")
 	fmt.Printf("Server se pokreće na: %s\n", port)
 
-	// Pokreni server
 	if err := r.Run(":" + port); err != nil {
 		logError(err)
 	}
