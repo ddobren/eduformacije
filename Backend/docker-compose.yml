@@ -1,15 +1,17 @@
-version: "3.8"
-
 services:
   caddy:
     image: caddy:latest
+    container_name: caddy
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./srednje-programi.json:/srv/srednje-programi.json:ro
+      # Glavni Caddyfile iz foldera "caddy"
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Statičke datoteke (npr. srednje-programi.json) iz foldera "cdn"
+      - ./cdn:/srv/cdn:ro
+      # Volumeni za Caddy cert i config (LE, itd.)
       - caddy_data:/data
       - caddy_config:/config
     networks:
@@ -18,11 +20,14 @@ services:
       - engine
 
   engine:
-    build: .
+    build: ./engine
+    container_name: engine
     restart: unless-stopped
+    # Uzimamo varijable iz .env (u root-u projekta)
     env_file:
       - .env
     environment:
+      # Primjer - ako želite prebrisati ili dodati varijable
       - REDIS_ADDR=redis:6379
       - REDIS_PASSWORD=StrongRedisPassword123
     networks:
@@ -35,6 +40,7 @@ services:
 
   mongo:
     image: mongo
+    container_name: mongo
     restart: unless-stopped
     volumes:
       - mongo_data:/data/db
@@ -51,10 +57,11 @@ services:
 
   redis:
     image: redis:6.2.6
+    container_name: redis
     restart: unless-stopped
     volumes:
       - redis_data:/data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./engine/redis.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
     environment:
       - REDIS_PASSWORD=StrongRedisPassword123
