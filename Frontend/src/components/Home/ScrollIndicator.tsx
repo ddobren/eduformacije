@@ -17,20 +17,20 @@ export const ScrollIndicator = () => {
 
   return (
     <motion.div
-      className="absolute bottom-8 left-0 w-full flex justify-center"
+      className="absolute bottom-4 sm:bottom-8 left-0 w-full flex justify-center"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
       transition={{ duration: 0.3 }}
     >
       <motion.button
-        className="p-2 rounded-full bg-primary-500/10 border border-primary-500/20 backdrop-blur-sm hover:bg-primary-500/20 transition-all duration-300"
+        className="p-2 sm:p-3 rounded-full bg-primary-500/10 border border-primary-500/20 backdrop-blur-sm hover:bg-primary-500/20 transition-all duration-300"
         onClick={scrollToFeatures}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
         <motion.div
           animate={{
-            y: [0, 8, 0],
+            y: [0, 6, 0],
           }}
           transition={{
             duration: 1.5,
@@ -38,9 +38,10 @@ export const ScrollIndicator = () => {
             ease: "easeInOut",
           }}
         >
-          <ChevronDown className="w-6 h-6 text-primary-400" />
+          <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-primary-400" />
         </motion.div>
       </motion.button>
     </motion.div>
   )
 }
+
