@@ -16,14 +16,13 @@ services:
     depends_on:
       - cdn
       - engine
-
-cdn:
-  image: caddy:latest
-  restart: unless-stopped
-  volumes:
-    - ./srednje-programi.json:/srv/srednje-programi.json:ro # Mapira samo jedan fajl
-  networks:
-    - default
+  cdn:
+    image: caddy:latest
+    restart: unless-stopped
+    volumes:
+      - ./srednje-programi.json:/srv/srednje-programi.json:ro # Mapira samo jedan fajl
+    networks:
+      - default
 
   engine:
     build: .
