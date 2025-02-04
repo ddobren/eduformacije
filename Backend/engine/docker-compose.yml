@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   caddy:
@@ -17,13 +17,13 @@ services:
       - cdn
       - engine
 
-  cdn:
-    image: caddy:latest
-    restart: unless-stopped
-    volumes:
-      - ./static:/srv:ro  # CDN sada služi sve datoteke iz 'static' direktorija
-    networks:
-      - default
+cdn:
+  image: caddy:latest
+  restart: unless-stopped
+  volumes:
+    - ./srednje-programi.json:/srv/srednje-programi.json:ro # Mapira samo jedan fajl
+  networks:
+    - default
 
   engine:
     build: .
@@ -35,7 +35,7 @@ services:
     depends_on:
       - mongo
       - redis
-      - cdn  # Engine se pokreće tek nakon CDNa
+      - cdn # Engine se pokreće tek nakon CDNa
 
   mongo:
     image: mongo
@@ -56,7 +56,7 @@ services:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
     sysctls:
-      net.core.somaxconn: '65535'
+      net.core.somaxconn: "65535"
     networks:
       - default
     deploy:
@@ -76,6 +76,7 @@ volumes:
   redis_data:
   caddy_data:
   caddy_config:
+
 
 networks:
   default:
