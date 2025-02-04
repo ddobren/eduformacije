@@ -3,11 +3,6 @@ cdn.eduformacije.com {
     file_server
 }
 
-45.90.120.221 {
-    root * /srv/cdn
-    file_server
-}
-
 engine.eduformacije.com {
     reverse_proxy engine:80
 }
