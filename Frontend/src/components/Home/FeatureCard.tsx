@@ -15,19 +15,24 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
 }) => {
   return (
     <motion.div 
-      className="bg-gray-900 rounded-lg p-6 shadow-lg transition-all duration-300 hover:shadow-xl h-full"
-      whileHover={{ scale: 1.03 }}
+      className="group relative bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800 hover:border-primary-500/50 transition-all duration-300 h-full overflow-hidden"
+      whileHover={{ scale: 1.02 }}
     >
-      <div className="flex flex-col items-center text-center space-y-4">
-        <div className="bg-primary-500/10 rounded-full p-4">
-          <Icon className="w-10 h-10 sm:w-12 sm:h-12 text-primary-400" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      <div className="relative flex flex-col items-center text-center space-y-4">
+        <div className="bg-primary-500/10 rounded-xl p-4 group-hover:bg-primary-500/20 transition-colors duration-300">
+          <Icon className="w-8 h-8 text-primary-400 group-hover:text-primary-300 transition-colors duration-300" />
         </div>
-        <h3 className="text-xl sm:text-2xl font-semibold text-white">{title}</h3>
-        <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
+        
+        <h3 className="text-xl font-semibold text-white group-hover:text-primary-300 transition-colors duration-300">
+          {title}
+        </h3>
+        
+        <p className="text-gray-300 leading-relaxed">
           {description}
         </p>
       </div>
     </motion.div>
   );
 };
-

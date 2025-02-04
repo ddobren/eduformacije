@@ -22,8 +22,8 @@ export const ScrollIndicator = () => {
       animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
       transition={{ duration: 0.3 }}
     >
-      <motion.div
-        className="cursor-pointer"
+      <motion.button
+        className="p-2 rounded-full bg-primary-500/10 border border-primary-500/20 backdrop-blur-sm hover:bg-primary-500/20 transition-all duration-300"
         onClick={scrollToFeatures}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
@@ -37,12 +37,10 @@ export const ScrollIndicator = () => {
             repeat: Number.POSITIVE_INFINITY,
             ease: "easeInOut",
           }}
-          className="flex flex-col items-center gap-2"
         >
-          <ChevronDown className="w-8 h-8 text-primary" />
+          <ChevronDown className="w-6 h-6 text-primary-400" />
         </motion.div>
-      </motion.div>
+      </motion.button>
     </motion.div>
   )
 }
-
