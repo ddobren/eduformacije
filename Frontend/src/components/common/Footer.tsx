@@ -20,6 +20,11 @@ export const Footer = () => {
             <h3 className="text-white font-semibold mb-6">Linkovi</h3>
             <ul className="space-y-3">
               <li>
+                <Link to="/news" className="hover:text-white transition-colors">
+                  Novosti
+                </Link>
+              </li>
+              <li>
                 <Link to="/about" className="hover:text-white transition-colors">
                   O nama
                 </Link>
@@ -43,6 +48,11 @@ export const Footer = () => {
               <li>
                 <Link to="/privacy" className="hover:text-white transition-colors">
                   Privatnost
+                </Link>
+              </li>
+              <li>
+                <Link to="/srednje-skole" className="hover:text-white transition-colors">
+                  Srednje škole
                 </Link>
               </li>
             </ul>
