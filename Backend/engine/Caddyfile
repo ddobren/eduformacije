@@ -5,6 +5,9 @@ engine.eduformacije.com {
 cdn.eduformacije.com {
     root * /srv
     file_server
-    try_files {path} /srednje-programi.json
+    # Ako ste u starom Caddyfile-u imali `try_files`,
+    # u većini slučajeva je sasvim dovoljno samo:
+    #   try_files {path} /srednje-programi.json
+    # ali zapravo možete i bez toga, osim ako zaista
+    # treba fallback na isti fajl.
 }
-
