@@ -1,182 +1,283 @@
-import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { Menu, X } from "lucide-react"
-import { Logo } from "./Logo"
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import { Logo } from "./Logo";
 
 interface NavLinkProps {
-  path: string
-  label: string
+  path: string;
+  label: string;
+  highlight?: boolean;
 }
 
-const NavLink = ({ path, label }: NavLinkProps) => {
-  const location = useLocation()
-  const isActive = location.pathname === path
-  const isSrednje = path === "/srednje-skole"
+const NavLink = ({ path, label, highlight }: NavLinkProps) => {
+  const location = useLocation();
+  const isActive = location.pathname === path;
+
+  if (highlight) {
+    return (
+      <Link
+        to={path}
+        className={`  
+          relative px-4 py-2 text-sm font-semibold
+          flex items-center
+          group
+          transition-all duration-300 ease-in-out
+          text-transparent
+          bg-clip-text
+          bg-gradient-to-r 
+          from-gray-500 via-gray-300 to-gray-500
+          bg-[length:200%_auto]
+          animate-gradient-text
+          hover:from-gray-600 hover:via-gray-400 hover:to-gray-600
+        `}
+      >
+        {label}
+      </Link>
+    );
+  }
 
   return (
     <Link
       to={path}
-      className={`relative px-3 py-2 rounded-lg text-sm font-medium 
-                  transition-all duration-200 group
-                  ${isActive ? "text-white bg-gray-800/60" : "text-gray-300 hover:text-white hover:bg-gray-800/40"}
-                  ${isSrednje ? "overflow-hidden" : ""}
+      className={`
+        relative px-4 py-2 text-sm font-medium
+        transition-all duration-300 ease-in-out
+        flex items-center
+        ${isActive ? "text-primary-500" : "text-gray-300 hover:text-white"}
       `}
     >
       {label}
-
       <span
-        className={`absolute bottom-1.5 left-1/2 -translate-x-1/2 h-0.5 rounded-full 
-                    bg-gradient-to-r from-primary-400 to-primary-600 
-                    transition-all duration-300 ease-out 
-          ${isActive ? "w-8 opacity-100" : "w-0 opacity-0 group-hover:w-8 group-hover:opacity-100"}
-        `}
+        className={`
+        absolute bottom-0 left-0 w-full h-0.5
+        transform origin-left scale-x-0 transition-transform duration-300
+        bg-gradient-to-r from-primary-400 to-primary-600
+        ${isActive ? "scale-x-100" : "group-hover:scale-x-100"}
+      `}
       />
-
-      {isSrednje && (
-        <span
-          className="pointer-events-none absolute inset-0 
-                     rounded-lg border-4 border-primary-500 
-                     group-hover:border-transparent 
-                     transition-all duration-300"
-        />
-      )}
     </Link>
-  )
-}
+  );
+};
 
-interface MobileMenuProps {
-  isOpen: boolean
-  navLinks: Array<NavLinkProps>
-  toggleMenu: () => void
-}
+const MobileMenu = ({
+  isOpen,
+  navLinks,
+  onClose,
+}: {
+  isOpen: boolean;
+  navLinks: NavLinkProps[];
+  onClose: () => void;
+}) => {
+  const location = useLocation();
+  const menuRef = useRef<HTMLDivElement>(null);
 
-const MobileMenu = ({ isOpen, navLinks, toggleMenu }: MobileMenuProps) => {
-  const location = useLocation()
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    const timer = setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
   return (
     <div
-      className={`fixed inset-0 z-0 bg-gray-950/98 backdrop-blur-md lg:hidden transition-all duration-300 ${
-        isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
-      }`}
+      className={`
+        fixed inset-0 z-50 
+        transition-all duration-300 ease-in-out
+        pointer-events-none
+        lg:hidden
+      `}
     >
+      {/* Backdrop */}
       <div
-        className={`flex flex-col items-center justify-center min-h-screen space-y-4 p-4 
-                    transform transition-all duration-300 ease-out 
-                    ${isOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}
+        className={`
+          absolute inset-0 bg-black/95
+          transition-opacity duration-300
+          ${isOpen ? "opacity-100" : "opacity-0"}
+        `}
+      />
+
+      {/* Menu content */}
+      <div
+        ref={menuRef}
+        className={`
+          absolute inset-0 flex flex-col
+          transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-y-0 pointer-events-auto" : "-translate-y-full"}
         `}
       >
-        {navLinks.map(({ path, label }, index) => (
+        <div className="p-4 flex justify-between items-center">
           <Link
-            key={path}
-            to={path}
-            onClick={toggleMenu}
-            style={{ transitionDelay: `${index * 50}ms` }}
-            className={`relative w-full max-w-xs px-4 py-3 text-center text-base font-medium 
-                        rounded-lg transition-all duration-200 transform 
-                        hover:scale-105 
-                        ${
-                          location.pathname === path
-                            ? "text-white bg-gray-800/60 shadow-md shadow-primary-500/10"
-                            : "text-gray-300 hover:text-white hover:bg-gray-800/40"
-                        }
-                        ${path === "/srednje-skole" ? "overflow-hidden" : ""}
-            `}
+            to="/"
+            className="flex items-center space-x-2 group"
+            onClick={onClose}
           >
-            {label}
-
-            {location.pathname === path && (
-              <span className="absolute bottom-2.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full" />
-            )}
-
-            {path === "/srednje-skole" && (
-              <span
-                className="pointer-events-none absolute inset-0 
-                           rounded-lg border-4 border-primary-500 
-                           group-hover:border-transparent 
-                           transition-all duration-300"
-              />
-            )}
+            <Logo />
+            <span className="text-2xl font-bold">
+              <span className="text-white">Edu</span>
+              <span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
+                formacije
+              </span>
+            </span>
           </Link>
-        ))}
+          <button
+            onClick={onClose}
+            className="text-gray-300 hover:text-white transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="w-8 h-8" />
+          </button>
+        </div>
+
+        <div className="flex-grow overflow-y-auto">
+          <div className="flex flex-col px-4 py-6 space-y-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`
+                  block py-3 px-4 text-lg font-medium
+                  transition-all duration-300 ease-in-out
+                  ${
+                    link.highlight
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-gray-500 via-gray-300 to-gray-500 bg-[length:200%_auto] animate-gradient-text"
+                      : location.pathname === link.path
+                      ? "text-primary-400"
+                      : "text-gray-300 hover:text-white"
+                  }
+                `}
+                onClick={onClose}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const location = useLocation()
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const prevScrollY = useRef(0);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
-    setIsOpen(false)
-    document.body.style.overflow = ""
-  }, [location.pathname])
+    if (isOpen) {
+      prevScrollY.current = window.scrollY;
+
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${prevScrollY.current}px`;
+      document.body.style.width = "100%";
+    } else {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+
+      window.scrollTo(0, prevScrollY.current);
+    }
+
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen)
-    document.body.style.overflow = !isOpen ? "hidden" : ""
-  }
+    setIsOpen(!isOpen);
+  };
 
-  const navLinks = [
+  const navLinks: NavLinkProps[] = [
     { path: "/", label: "Početna" },
     { path: "/news", label: "Novosti" },
     { path: "/about", label: "O nama" },
     { path: "/contact", label: "Kontakt" },
     { path: "/faq", label: "FAQ" },
-    { path: "/srednje-skole", label: "Srednje škole" },
-  ]
+    { path: "/srednje-skole", label: "Srednje škole", highlight: true },
+  ];
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled ? "bg-gray-950/95 backdrop-blur-sm shadow-lg" : "bg-transparent"
-      }`}
+      className={`
+      fixed top-0 left-0 right-0 z-40
+      transition-all duration-300 ease-in-out
+      ${
+        scrolled
+          ? "bg-black/95 backdrop-blur-md py-2 shadow-lg shadow-black/10"
+          : "bg-transparent py-4"
+      }
+    `}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
-          <Link to="/" className="flex items-center gap-2 group" onClick={() => setIsOpen(false)}>
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2 group">
             <Logo />
-            <span className="text-xl font-bold text-white tracking-tight">
-              Edu
-              <span className="bg-gradient-to-r from-primary-400 via-primary-500 to-primary-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold">
+              <span className="text-white">Edu</span>
+              <span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
                 formacije
               </span>
             </span>
           </Link>
 
-          <div className="hidden lg:flex items-center space-x-1">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-4">
             {navLinks.map((link) => (
               <NavLink key={link.path} {...link} />
             ))}
           </div>
 
+          {/* Mobile Menu Button */}
           <button
             onClick={toggleMenu}
-            className={`lg:hidden relative z-10 p-2 rounded-lg text-gray-300 hover:text-white 
-                        transition-all duration-200 hover:bg-gray-800/40 
-                        focus:outline-none focus:ring-2 focus:ring-primary-400/50 
-                        ${isOpen ? "text-white" : ""}`}
+            className={`
+              lg:hidden z-50 p-2
+              text-gray-100 hover:text-primary-400
+              transition-colors duration-300
+              focus:outline-none
+            `}
             aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
           >
-            <span className="sr-only">{isOpen ? "Close menu" : "Open menu"}</span>
-            {isOpen ? (
-              <X className="w-6 h-6 transition-transform duration-300 rotate-90 hover:rotate-180" />
-            ) : (
-              <Menu className="w-6 h-6 transition-transform duration-200 hover:scale-110" />
-            )}
+            <Menu className={`w-8 h-8 ${isOpen ? "hidden" : "block"}`} />
           </button>
 
-          <MobileMenu isOpen={isOpen} navLinks={navLinks} toggleMenu={toggleMenu} />
+          {/* Mobile Menu */}
+          <MobileMenu
+            isOpen={isOpen}
+            navLinks={navLinks}
+            onClose={() => setIsOpen(false)}
+          />
         </div>
       </div>
     </nav>
-  )
-}
-
+  );
+};
