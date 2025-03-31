@@ -1,3 +1,5 @@
+"use client"
+
 import { Search, BotIcon as Robot, ArrowRight } from "lucide-react"
 import { NormalButton } from "../common/NormalButton"
 import { GradientButton } from "../common/GradientButton"
@@ -13,29 +15,31 @@ export const Hero = () => {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
       <AnimatedBackground />
 
-      <div className="relative w-full max-w-7xl mx-auto flex flex-col justify-center items-center space-y-8 sm:space-y-10">
+      <div className="relative w-full max-w-6xl mx-auto flex flex-col justify-center items-center">
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
+          {/* AI Badge */}
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 mb-8 sm:mb-10 hover:bg-primary-500/15 transition-all duration-300 backdrop-blur-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 mb-10 hover:bg-primary-500/15 transition-all duration-300 backdrop-blur-sm"
             whileHover={{ scale: 1.05 }}
           >
             <Robot className="w-4 h-4 text-primary-400" />
-            <span className="text-sm sm:text-base text-primary-400 font-medium">Powered by AI model</span>
+            <span className="text-sm text-primary-400 font-medium">Powered by AI model</span>
           </motion.div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 tracking-tight leading-tight">
+          {/* Main Heading */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-tight">
             Pronađi svoju{" "}
             <span className="relative">
-              <span className="bg-gradient-to-r from-primary-400 via-primary-500 to-primary-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-400 bg-clip-text text-transparent">
                 idealnu školu
               </span>
               <motion.span
-                className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary-400/0 via-primary-500 to-primary-400/0"
+                className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-blue-400/0 via-blue-500 to-blue-400/0"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 1, delay: 0.5 }}
@@ -43,15 +47,17 @@ export const Hero = () => {
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-gray-300 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
+          {/* Description */}
+          <p className="text-base sm:text-lg text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
             Otkrijte najbolje obrazovne mogućnosti uz pomoć našeg AI sustava koji personalizira preporuke prema vašim
             jedinstvenim potrebama.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center w-full sm:w-auto">
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center w-full sm:w-auto">
             <GradientButton
               onClick={() => navigateTo("/find")}
-              className="w-full sm:w-auto text-base py-3 sm:py-4 px-6 sm:px-8 group"
+              className="w-full sm:w-auto text-base py-3.5 px-7 group"
             >
               <Robot className="w-5 h-5 mr-2 group-hover:animate-pulse" />
               Započni AI pretragu
@@ -60,29 +66,30 @@ export const Hero = () => {
 
             <NormalButton
               onClick={() => navigateTo("/search")}
-              className="w-full sm:w-auto text-base py-3 sm:py-4 px-6 sm:px-8 bg-white/10 hover:bg-white/15 backdrop-blur-sm transition-all duration-300"
+              className="w-full sm:w-auto text-base py-3.5 px-7 bg-white/10 hover:bg-white/15 backdrop-blur-sm transition-all duration-300"
             >
               <Search className="w-5 h-5 mr-2" />
               Pretraži sve škole
             </NormalButton>
           </div>
 
+          {/* Stats */}
           <motion.div
-            className="mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-8 text-gray-400 text-sm sm:text-base"
+            className="mt-16 flex flex-wrap justify-center gap-8 text-gray-400 text-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-primary-500" />
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
               <span>1000+ škola</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-primary-500" />
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
               <span>AI preporuke</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-primary-500" />
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
               <span>24/7 podrška</span>
             </div>
           </motion.div>
