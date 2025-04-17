@@ -12,6 +12,7 @@ import FAQ from './pages/FAQ';
 import Privacy from './pages/Privacy';
 import { SrednjeSkole } from './pages/SrednjeSkole';
 import Novosti from './pages/Novosti';
+import BetaSignupPage from './components/BetaSignup/BetaSignup';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -48,6 +49,7 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/beta-signup" element={<BetaSignupPage />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/srednje-skole" element={<SrednjeSkole />} />
             <Route path="/privacy" element={<Privacy />} />

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ScrollIndicator } from "./ScrollIndicator"
 import { UpdateToast } from "../common/UpdateToast"
+import { BetaBadge } from "../common/BetaBadge"
 
 export const Hero = () => {
   const navigateTo = useNavigate()
@@ -13,6 +14,7 @@ export const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
       <UpdateToast />
+      <BetaBadge />
       <AnimatedBackground />
 
       <div className="relative w-full max-w-6xl mx-auto flex flex-col justify-center items-center">
