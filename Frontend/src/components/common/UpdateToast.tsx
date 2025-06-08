@@ -8,7 +8,7 @@ interface UpdateToastProps {
 }
 
 export const UpdateToast = ({
-  message = "Aplikacija je trenutno u procesu ažuriranja. Neke funkcionalnosti možda neće biti dostupne.",
+  message = "Aplikacija je ažurirana na najnovije programe obrazovanja!",
   duration = null,
 }: UpdateToastProps) => {
   const [isVisible, setIsVisible] = useState(true)
